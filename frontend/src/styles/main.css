@@ -87,8 +87,7 @@ th:nth-child(2) {
   width: 3rem;
 }
 
-td:last-child,
-th:last-child {
+.numeric {
   text-align: right;
   font-variant-numeric: tabular-nums;
   font-weight: 600;
@@ -108,6 +107,157 @@ th:last-child {
 
 .error {
   color: var(--accent);
+}
+
+.history-chart {
+  margin-top: 2.5rem;
+}
+
+.history-chart h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.75rem;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--fg);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legend-swatch {
+  width: 1rem;
+  height: 2px;
+  border-radius: 1px;
+  display: inline-block;
+}
+
+.legend-swatch-muted {
+  background: var(--muted);
+  opacity: 0.5;
+}
+
+.legend-other {
+  color: var(--muted);
+}
+
+.history-chart-wrap {
+  position: relative;
+}
+
+.history-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.history-svg:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.grid line {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.axis-label {
+  fill: var(--muted);
+  font-size: 9px;
+}
+
+.history-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.history-line-muted {
+  stroke: var(--muted);
+  opacity: 0.45;
+}
+
+.history-dot {
+  stroke: var(--bg);
+  stroke-width: 2;
+}
+
+.crosshair {
+  stroke: var(--muted);
+  stroke-width: 1;
+  pointer-events: none;
+}
+
+.chart-tooltip {
+  position: absolute;
+  min-width: 180px;
+  max-width: 220px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.8rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.chart-tooltip-title {
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.chart-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.1rem 0;
+}
+
+.chart-tooltip-key {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.chart-tooltip-name {
+  flex: 1;
+  color: var(--fg);
+}
+
+.chart-tooltip-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.history-table-details {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+}
+
+.history-table-details summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.history-table-wrap {
+  overflow-x: auto;
+  margin-top: 0.75rem;
+}
+
+.history-table {
+  font-size: 0.8rem;
+  white-space: nowrap;
 }
 
 footer {

@@ -9,34 +9,35 @@ This project reads an **unofficial, publicly accessible F1 Fantasy data feed** a
 ## Architecture
 
 ```
-fetch/  (Node, runs in CI or locally — a single plain HTTP request)
-   │  reads F1's public leaderboard feed, writes JSON
+fetch/  (Node, runs in CI or locally — plain HTTP requests, no auth)
+   │  reads F1's public leaderboard + per-race feeds, writes JSON
    ▼
-data/league.json  (committed to the repo)
+data/{league,history}.json  (committed to the repo)
    │  copied into frontend/public/data/ at build time
    ▼
 frontend/  (static TypeScript + Vite site)
-   │  fetches ./data/league.json at runtime, renders a standings table
+   │  fetches ./data/*.json at runtime, renders a table + a line chart
    ▼
 GitHub Pages
 ```
 
-- **`shared/`** — TypeScript types describing `data/league.json`'s schema. Both `fetch` (the writer) and `frontend` (the reader) import from here, so the two sides of the contract can't drift apart.
-- **`fetch/`** — a small Node script that fetches and reshapes F1's public leaderboard feed. No credentials, no browser, no login of any kind.
-- **`frontend/`** — a plain TypeScript + Vite site with no UI framework. The whole app is one standings table, so a framework wouldn't add much; the interesting parts are strict TypeScript, a clean fetch/render split, and secure DOM handling (see below).
-- **`data/`** — the committed JSON snapshot. The frontend fetches it at runtime rather than having it inlined at build time, so a data-only commit updates what's shown on next page load even if a redeploy is ever delayed.
+- **`shared/`** — TypeScript types describing `data/*.json`'s schema. Both `fetch` (the writer) and `frontend` (the reader) import from here, so the two sides of the contract can't drift apart.
+- **`fetch/`** — a small Node script that fetches and reshapes F1's public feeds. No credentials, no browser, no login of any kind.
+- **`frontend/`** — a plain TypeScript + Vite site with no UI framework. The interesting parts are strict TypeScript, a clean fetch/render split, secure DOM handling (see below), and a hand-built SVG chart following an emphasis-color pattern (a few teams highlighted, the rest as context) rather than a charting library.
+- **`data/`** — the committed JSON snapshots. The frontend fetches them at runtime rather than having them inlined at build time, so a data-only commit updates what's shown on next page load even if a redeploy is ever delayed.
 
 ## How data fetching actually works
 
-F1 publishes each private league's current standings as a static, publicly cached file:
+F1 publishes each private league's standings as static, publicly cached files — both the current cumulative totals and, less obviously, **each individual race's results**:
 
 ```
-https://fantasy.formula1.com/feeds/leaderboard/privateleague/list_1_{leagueId}_0_1.json
+https://fantasy.formula1.com/feeds/leaderboard/privateleague/list_1_{leagueId}_0_1.json         # current standings
+https://fantasy.formula1.com/feeds/leaderboard/privateleague/list_2_{leagueId}_{round}_1.json    # one race's results
 ```
 
-No login, cookies, or headers of any kind are required — this was confirmed with a plain `curl` request. It's served off S3/CloudFront alongside F1's other public reference feeds (schedules, driver lists), presumably so a league's standings can be shared or embedded without every viewer needing an F1 account. `fetch/src/fetchLeague.ts` just requests that URL and remaps the response into our own clean schema.
+No login, cookies, or headers of any kind are required for either — confirmed with plain `curl` requests. They're served off S3/CloudFront alongside F1's other public reference feeds (schedules, driver lists), presumably so a league's standings can be shared or embedded without every viewer needing an F1 account. `fetch/src/fetchLeague.ts` reads the first; `fetch/src/fetchHistory.ts` probes `{round}` starting at 1 until a round 404s (i.e. that race hasn't happened yet) and reshapes every result found into `data/history.json`, which the frontend turns into cumulative point totals for the race-over-race chart.
 
-This is deliberately much simpler than it first appears it needs to be. F1's actual authenticated API (`fantasy.formula1.com/services/...`) sits behind Akamai Bot Manager and requires a full browser-driven login to reach — that path was built, debugged, and made to work during this project's development, but was removed once this public feed was discovered, since it gives the same standings data with no credentials, no bot-detection fragility, and nothing to keep secret. (It only lacks per-gameweek history, which the authenticated API could provide — not implemented here.)
+This is deliberately much simpler than it first appears it needs to be. F1's actual authenticated API (`fantasy.formula1.com/services/...`) sits behind Akamai Bot Manager and requires a full browser-driven login to reach — that path was built, debugged, and made to work during this project's development, but was removed once these public feeds were discovered, since they give the same data with no credentials, no bot-detection fragility, and nothing to keep secret.
 
 ## Local development
 
@@ -51,7 +52,7 @@ To run the data-fetching script locally:
 
 ```bash
 npm run fetch -w fetch
-cp data/league.json frontend/public/data/
+cp data/*.json frontend/public/data/
 ```
 
 No credentials or `.env` file needed — optionally set `LEAGUE_ID` / `LEAGUE_NAME` env vars to point at a different league.
@@ -70,7 +71,7 @@ npm test                # runs fetch's unit tests
 
 Two GitHub Actions workflows do the work:
 
-- **`update-data.yml`** — re-fetches league data every 6 hours, plus on manual trigger. Commits `data/league.json` only if something actually changed.
+- **`update-data.yml`** — re-fetches league data every 6 hours, plus on manual trigger. Commits `data/*.json` only if something actually changed.
 - **`deploy.yml`** — builds the frontend and deploys to GitHub Pages whenever `frontend/`, `data/`, or `shared/` change on `main` (so a data-only commit from the workflow above triggers a redeploy automatically).
 
 ### One-time setup (GitHub UI)
@@ -92,5 +93,5 @@ No repository secrets are required — the data source needs no authentication.
 
 ## Known limitations
 
-- **This depends on an undocumented public feed that could change or disappear without notice.** F1 doesn't publish this as a supported integration point; a red `update-data.yml` run means that URL's shape or availability changed, not necessarily a bug in this repo.
-- **No per-gameweek history.** The public feed only exposes current cumulative standings. A history/trend view would require reintroducing F1's authenticated API and the Akamai-login automation this project intentionally moved away from.
+- **This depends on undocumented public feeds that could change or disappear without notice.** F1 doesn't publish these as a supported integration point; a red `update-data.yml` run means a feed's shape, URL pattern, or availability changed, not necessarily a bug in this repo.
+- **History only covers races F1's feed has published so far** — there's no way to backfill data from before this project started reading it if a round's feed is ever taken down, and a season with more rounds than `fetchHistory.ts`'s probe cap (currently 30) would need that constant raised.
