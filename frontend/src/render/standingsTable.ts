@@ -5,7 +5,10 @@ import type { LeagueStandingsFile } from '@fantasy-f1/shared';
  * via F1's API and are rendered here with textContent only — never
  * innerHTML — so a malicious display name can't inject markup/scripts.
  */
-export function renderStandingsTable(data: LeagueStandingsFile): HTMLElement {
+export function renderStandingsTable(
+  data: LeagueStandingsFile,
+  lastRacePoints: Map<string, number> | null,
+): HTMLElement {
   const container = document.createElement('section');
 
   const heading = document.createElement('h1');
@@ -20,9 +23,12 @@ export function renderStandingsTable(data: LeagueStandingsFile): HTMLElement {
   const table = document.createElement('table');
   const thead = document.createElement('thead');
   const headRow = document.createElement('tr');
-  for (const label of ['', 'Rank', 'Team', 'Owner', 'Score']) {
+  const columns = ['', 'Rank', 'Team', 'Owner', 'Score'];
+  if (lastRacePoints) columns.push('Last Race');
+  for (const label of columns) {
     const th = document.createElement('th');
     th.textContent = label;
+    if (label === 'Score' || label === 'Last Race') th.classList.add('numeric');
     headRow.append(th);
   }
   thead.append(headRow);
@@ -50,8 +56,17 @@ export function renderStandingsTable(data: LeagueStandingsFile): HTMLElement {
     row.append(ownerCell);
 
     const scoreCell = document.createElement('td');
+    scoreCell.className = 'numeric';
     scoreCell.textContent = String(entrant.score);
     row.append(scoreCell);
+
+    if (lastRacePoints) {
+      const lastRaceCell = document.createElement('td');
+      lastRaceCell.className = 'numeric';
+      const points = lastRacePoints.get(entrant.userId);
+      lastRaceCell.textContent = points === undefined ? '—' : String(points);
+      row.append(lastRaceCell);
+    }
 
     tbody.append(row);
   }

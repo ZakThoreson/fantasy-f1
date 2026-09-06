@@ -1,0 +1,799 @@
+{
+  "fetchedAt": "2026-09-06T18:52:27.544Z",
+  "leagueId": "4358307",
+  "rounds": [
+    {
+      "round": 1,
+      "entrants": [
+        {
+          "userId": "201738224",
+          "points": 251
+        },
+        {
+          "userId": "202303355",
+          "points": 239
+        },
+        {
+          "userId": "203033531",
+          "points": 238
+        },
+        {
+          "userId": "78775061",
+          "points": 231
+        },
+        {
+          "userId": "217725028",
+          "points": 175
+        },
+        {
+          "userId": "64892595",
+          "points": 165
+        },
+        {
+          "userId": "182551911",
+          "points": 131
+        },
+        {
+          "userId": "217723884",
+          "points": 122
+        },
+        {
+          "userId": "179358368",
+          "points": 116
+        },
+        {
+          "userId": "202806462",
+          "points": 112
+        },
+        {
+          "userId": "154970788",
+          "points": 98
+        },
+        {
+          "userId": "202798179",
+          "points": 88
+        },
+        {
+          "userId": "188775059",
+          "points": 78
+        },
+        {
+          "userId": "181271801",
+          "points": 56
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "entrants": [
+        {
+          "userId": "201738224",
+          "points": 482
+        },
+        {
+          "userId": "202806462",
+          "points": 374
+        },
+        {
+          "userId": "78775061",
+          "points": 373
+        },
+        {
+          "userId": "217723884",
+          "points": 361
+        },
+        {
+          "userId": "64892595",
+          "points": 354
+        },
+        {
+          "userId": "202303355",
+          "points": 352
+        },
+        {
+          "userId": "203033531",
+          "points": 344
+        },
+        {
+          "userId": "179358368",
+          "points": 324
+        },
+        {
+          "userId": "188775059",
+          "points": 297
+        },
+        {
+          "userId": "217725028",
+          "points": 285
+        },
+        {
+          "userId": "182551911",
+          "points": 282
+        },
+        {
+          "userId": "181271801",
+          "points": 250
+        },
+        {
+          "userId": "154970788",
+          "points": 177
+        },
+        {
+          "userId": "202798179",
+          "points": 97
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "entrants": [
+        {
+          "userId": "78775061",
+          "points": 293
+        },
+        {
+          "userId": "202303355",
+          "points": 239
+        },
+        {
+          "userId": "188775059",
+          "points": 217
+        },
+        {
+          "userId": "217723884",
+          "points": 211
+        },
+        {
+          "userId": "182551911",
+          "points": 205
+        },
+        {
+          "userId": "179358368",
+          "points": 198
+        },
+        {
+          "userId": "154970788",
+          "points": 189
+        },
+        {
+          "userId": "217725028",
+          "points": 179
+        },
+        {
+          "userId": "203033531",
+          "points": 178
+        },
+        {
+          "userId": "201738224",
+          "points": 175
+        },
+        {
+          "userId": "202806462",
+          "points": 170
+        },
+        {
+          "userId": "64892595",
+          "points": 147
+        },
+        {
+          "userId": "181271801",
+          "points": 109
+        },
+        {
+          "userId": "202798179",
+          "points": 94
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "entrants": [
+        {
+          "userId": "202798179",
+          "points": 262
+        },
+        {
+          "userId": "202303355",
+          "points": 241
+        },
+        {
+          "userId": "179358368",
+          "points": 223
+        },
+        {
+          "userId": "154970788",
+          "points": 220
+        },
+        {
+          "userId": "78775061",
+          "points": 215
+        },
+        {
+          "userId": "188775059",
+          "points": 197
+        },
+        {
+          "userId": "182551911",
+          "points": 185
+        },
+        {
+          "userId": "201738224",
+          "points": 182
+        },
+        {
+          "userId": "217723884",
+          "points": 178
+        },
+        {
+          "userId": "203033531",
+          "points": 171
+        },
+        {
+          "userId": "64892595",
+          "points": 139
+        },
+        {
+          "userId": "217725028",
+          "points": 136
+        },
+        {
+          "userId": "181271801",
+          "points": 70
+        },
+        {
+          "userId": "202806462",
+          "points": 66
+        }
+      ]
+    },
+    {
+      "round": 5,
+      "entrants": [
+        {
+          "userId": "78775061",
+          "points": 310
+        },
+        {
+          "userId": "203033531",
+          "points": 287
+        },
+        {
+          "userId": "154970788",
+          "points": 276
+        },
+        {
+          "userId": "202798179",
+          "points": 255
+        },
+        {
+          "userId": "201738224",
+          "points": 247
+        },
+        {
+          "userId": "179358368",
+          "points": 240
+        },
+        {
+          "userId": "188775059",
+          "points": 224
+        },
+        {
+          "userId": "217723884",
+          "points": 219
+        },
+        {
+          "userId": "64892595",
+          "points": 202
+        },
+        {
+          "userId": "182551911",
+          "points": 197
+        },
+        {
+          "userId": "202303355",
+          "points": 189
+        },
+        {
+          "userId": "202806462",
+          "points": 178
+        },
+        {
+          "userId": "181271801",
+          "points": 127
+        },
+        {
+          "userId": "217725028",
+          "points": 120
+        }
+      ]
+    },
+    {
+      "round": 6,
+      "entrants": [
+        {
+          "userId": "202798179",
+          "points": 215
+        },
+        {
+          "userId": "78775061",
+          "points": 210
+        },
+        {
+          "userId": "182551911",
+          "points": 210
+        },
+        {
+          "userId": "154970788",
+          "points": 176
+        },
+        {
+          "userId": "217723884",
+          "points": 149
+        },
+        {
+          "userId": "201738224",
+          "points": 144
+        },
+        {
+          "userId": "203033531",
+          "points": 132
+        },
+        {
+          "userId": "217725028",
+          "points": 106
+        },
+        {
+          "userId": "202303355",
+          "points": 84
+        },
+        {
+          "userId": "188775059",
+          "points": 77
+        },
+        {
+          "userId": "202806462",
+          "points": 67
+        },
+        {
+          "userId": "181271801",
+          "points": 55
+        },
+        {
+          "userId": "179358368",
+          "points": 46
+        },
+        {
+          "userId": "64892595",
+          "points": 11
+        }
+      ]
+    },
+    {
+      "round": 7,
+      "entrants": [
+        {
+          "userId": "203033531",
+          "points": 185
+        },
+        {
+          "userId": "217725028",
+          "points": 119
+        },
+        {
+          "userId": "64892595",
+          "points": 118
+        },
+        {
+          "userId": "202806462",
+          "points": 115
+        },
+        {
+          "userId": "188775059",
+          "points": 99
+        },
+        {
+          "userId": "201738224",
+          "points": 98
+        },
+        {
+          "userId": "154970788",
+          "points": 95
+        },
+        {
+          "userId": "202798179",
+          "points": 92
+        },
+        {
+          "userId": "217723884",
+          "points": 87
+        },
+        {
+          "userId": "202303355",
+          "points": 73
+        },
+        {
+          "userId": "78775061",
+          "points": 72
+        },
+        {
+          "userId": "182551911",
+          "points": 72
+        },
+        {
+          "userId": "181271801",
+          "points": 52
+        },
+        {
+          "userId": "179358368",
+          "points": 46
+        }
+      ]
+    },
+    {
+      "round": 8,
+      "entrants": [
+        {
+          "userId": "201738224",
+          "points": 231
+        },
+        {
+          "userId": "182551911",
+          "points": 211
+        },
+        {
+          "userId": "78775061",
+          "points": 211
+        },
+        {
+          "userId": "188775059",
+          "points": 210
+        },
+        {
+          "userId": "202303355",
+          "points": 210
+        },
+        {
+          "userId": "217723884",
+          "points": 203
+        },
+        {
+          "userId": "217725028",
+          "points": 198
+        },
+        {
+          "userId": "203033531",
+          "points": 181
+        },
+        {
+          "userId": "202798179",
+          "points": 167
+        },
+        {
+          "userId": "154970788",
+          "points": 163
+        },
+        {
+          "userId": "202806462",
+          "points": 136
+        },
+        {
+          "userId": "179358368",
+          "points": 117
+        },
+        {
+          "userId": "181271801",
+          "points": 104
+        },
+        {
+          "userId": "64892595",
+          "points": 81
+        }
+      ]
+    },
+    {
+      "round": 9,
+      "entrants": [
+        {
+          "userId": "154970788",
+          "points": 319
+        },
+        {
+          "userId": "64892595",
+          "points": 299
+        },
+        {
+          "userId": "201738224",
+          "points": 286
+        },
+        {
+          "userId": "179358368",
+          "points": 276
+        },
+        {
+          "userId": "202806462",
+          "points": 274
+        },
+        {
+          "userId": "203033531",
+          "points": 273
+        },
+        {
+          "userId": "78775061",
+          "points": 266
+        },
+        {
+          "userId": "182551911",
+          "points": 266
+        },
+        {
+          "userId": "188775059",
+          "points": 264
+        },
+        {
+          "userId": "202303355",
+          "points": 262
+        },
+        {
+          "userId": "217723884",
+          "points": 250
+        },
+        {
+          "userId": "217725028",
+          "points": 245
+        },
+        {
+          "userId": "202798179",
+          "points": 243
+        },
+        {
+          "userId": "181271801",
+          "points": 239
+        }
+      ]
+    },
+    {
+      "round": 10,
+      "entrants": [
+        {
+          "userId": "201738224",
+          "points": 239
+        },
+        {
+          "userId": "179358368",
+          "points": 210
+        },
+        {
+          "userId": "202303355",
+          "points": 207
+        },
+        {
+          "userId": "203033531",
+          "points": 205
+        },
+        {
+          "userId": "182551911",
+          "points": 205
+        },
+        {
+          "userId": "78775061",
+          "points": 205
+        },
+        {
+          "userId": "154970788",
+          "points": 201
+        },
+        {
+          "userId": "217723884",
+          "points": 201
+        },
+        {
+          "userId": "181271801",
+          "points": 199
+        },
+        {
+          "userId": "64892595",
+          "points": 193
+        },
+        {
+          "userId": "188775059",
+          "points": 189
+        },
+        {
+          "userId": "202806462",
+          "points": 183
+        },
+        {
+          "userId": "202798179",
+          "points": 137
+        },
+        {
+          "userId": "217725028",
+          "points": 95
+        }
+      ]
+    },
+    {
+      "round": 11,
+      "entrants": [
+        {
+          "userId": "201738224",
+          "points": 243
+        },
+        {
+          "userId": "154970788",
+          "points": 222
+        },
+        {
+          "userId": "203033531",
+          "points": 216
+        },
+        {
+          "userId": "217723884",
+          "points": 215
+        },
+        {
+          "userId": "78775061",
+          "points": 214
+        },
+        {
+          "userId": "182551911",
+          "points": 214
+        },
+        {
+          "userId": "202806462",
+          "points": 211
+        },
+        {
+          "userId": "202303355",
+          "points": 205
+        },
+        {
+          "userId": "188775059",
+          "points": 201
+        },
+        {
+          "userId": "179358368",
+          "points": 177
+        },
+        {
+          "userId": "217725028",
+          "points": 177
+        },
+        {
+          "userId": "202798179",
+          "points": 172
+        },
+        {
+          "userId": "64892595",
+          "points": 167
+        },
+        {
+          "userId": "181271801",
+          "points": 160
+        }
+      ]
+    },
+    {
+      "round": 12,
+      "entrants": [
+        {
+          "userId": "201738224",
+          "points": 305
+        },
+        {
+          "userId": "78775061",
+          "points": 271
+        },
+        {
+          "userId": "188775059",
+          "points": 257
+        },
+        {
+          "userId": "202303355",
+          "points": 231
+        },
+        {
+          "userId": "203033531",
+          "points": 229
+        },
+        {
+          "userId": "154970788",
+          "points": 210
+        },
+        {
+          "userId": "217723884",
+          "points": 192
+        },
+        {
+          "userId": "182551911",
+          "points": 189
+        },
+        {
+          "userId": "202798179",
+          "points": 147
+        },
+        {
+          "userId": "179358368",
+          "points": 121
+        },
+        {
+          "userId": "217725028",
+          "points": 120
+        },
+        {
+          "userId": "64892595",
+          "points": 99
+        },
+        {
+          "userId": "202806462",
+          "points": 85
+        },
+        {
+          "userId": "181271801",
+          "points": 37
+        }
+      ]
+    },
+    {
+      "round": 13,
+      "entrants": [
+        {
+          "userId": "182551911",
+          "points": 281
+        },
+        {
+          "userId": "188775059",
+          "points": 241
+        },
+        {
+          "userId": "202303355",
+          "points": 239
+        },
+        {
+          "userId": "78775061",
+          "points": 235
+        },
+        {
+          "userId": "154970788",
+          "points": 234
+        },
+        {
+          "userId": "203033531",
+          "points": 194
+        },
+        {
+          "userId": "202798179",
+          "points": 190
+        },
+        {
+          "userId": "201738224",
+          "points": 184
+        },
+        {
+          "userId": "217723884",
+          "points": 174
+        },
+        {
+          "userId": "217725028",
+          "points": 119
+        },
+        {
+          "userId": "179358368",
+          "points": 19
+        },
+        {
+          "userId": "202806462",
+          "points": 10
+        },
+        {
+          "userId": "181271801",
+          "points": -14
+        },
+        {
+          "userId": "64892595",
+          "points": -39
+        }
+      ]
+    }
+  ]
+}

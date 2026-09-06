@@ -29,3 +29,28 @@ export interface LeagueStandingsFile {
   minPoints: number;
   entrants: LeaderboardEntrant[];
 }
+
+/**
+ * Per-race points (not cumulative — can be negative) for every entrant, one
+ * entry per race F1 has published a feed for so far this season. F1 exposes
+ * this the same way it exposes current standings: a public, unauthenticated
+ * feed at .../list_2_{leagueId}_{round}_1.json, one static file per round.
+ * Team/owner names aren't repeated here — join on userId against
+ * LeagueStandingsFile.entrants, which already has them.
+ */
+export interface HistoryRoundEntry {
+  userId: string;
+  points: number;
+}
+
+export interface HistoryRound {
+  round: number;
+  entrants: HistoryRoundEntry[];
+}
+
+export interface HistoryFile {
+  fetchedAt: string;
+  leagueId: string;
+  /** Ascending by round number. */
+  rounds: HistoryRound[];
+}
