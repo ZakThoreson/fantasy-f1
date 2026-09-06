@@ -5,7 +5,7 @@ import { redactError } from './redact.js';
 
 const FANTASY_HOME_URL = 'https://fantasy.formula1.com/en/';
 const BY_PASSWORD_URL_PART = '/v2/account/subscriber/authenticate/by-password';
-const NETWORK_LOG_MAX_ENTRIES = 100;
+const NETWORK_LOG_MAX_ENTRIES = 150;
 const NAV_TIMEOUT_MS = 30_000;
 const RESPONSE_TIMEOUT_MS = 30_000;
 const FILL_RETRY_ATTEMPTS = 3;
@@ -25,6 +25,10 @@ const REESE84_POLL_INTERVAL_MS = 1_000;
 function isRelevantHost(url: string): boolean {
   try {
     const host = new URL(url).hostname;
+    // Pure image CDN — once logged in, the page requests dozens of sponsor
+    // logos and car renders that were flooding out the genuinely useful
+    // login/session/API entries within the capped buffer.
+    if (host === 'media.formula1.com') return false;
     return host.endsWith('formula1.com') || host.includes('akamai');
   } catch {
     return false;
@@ -87,6 +91,25 @@ async function waitForReese84Cookie(
     await new Promise((resolve) => setTimeout(resolve, REESE84_POLL_INTERVAL_MS));
   }
   return { found: false, waitedMs: Date.now() - start };
+}
+
+/**
+ * Polls state populated by a `page.on('response', ...)` handler rather than
+ * awaiting a single `page.waitForResponse(...)` promise directly — see the
+ * comment where that handler is registered for why.
+ */
+async function waitForCapturedToken(
+  getState: () => { token: string | undefined; failureReason: string | undefined },
+  timeoutMs: number,
+): Promise<string> {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    const { token, failureReason } = getState();
+    if (token) return token;
+    if (failureReason) throw new Error(failureReason);
+    await new Promise((resolve) => setTimeout(resolve, 200));
+  }
+  throw new Error(`Timed out after ${timeoutMs}ms waiting for the F1 login response.`);
 }
 
 /**
@@ -210,6 +233,40 @@ export async function getSubscriptionToken(
         if (networkLog.length > NETWORK_LOG_MAX_ENTRIES) networkLog.shift();
       }
     });
+
+    // A prior run proved the by-password call itself succeeds, but the app
+    // immediately redirects back to fantasy.formula1.com on success — by the
+    // time `await page.waitForResponse(...)` resolved and code went on to
+    // call `.json()` in a later step, the browser had already navigated away
+    // and Chrome could no longer retrieve the response body ("Response body
+    // is not available for a response that was navigated away from"). Read
+    // the body eagerly, inside this handler, the instant the response
+    // arrives — the earliest point possible, before navigation can occur.
+    let capturedToken: string | undefined;
+    let captureFailureReason: string | undefined;
+    page.on('response', (res) => {
+      if (!res.url().includes(BY_PASSWORD_URL_PART)) return;
+      if (!res.ok()) {
+        captureFailureReason = `F1 login rejected: ${res.status()} ${res.statusText()} — check credentials or account status.`;
+        return;
+      }
+      res.json().then(
+        (parsedBody: unknown) => {
+          const token = (parsedBody as { data?: { subscriptionToken?: string } })?.data
+            ?.subscriptionToken;
+          if (token) {
+            capturedToken = token;
+          } else {
+            captureFailureReason =
+              'F1 login response did not include a subscriptionToken — F1 may have changed their login flow.';
+          }
+        },
+        (err: unknown) => {
+          captureFailureReason = `Could not read F1 login response body: ${err instanceof Error ? err.message : String(err)}`;
+        },
+      );
+    });
+
     page.on('console', (msg) => {
       if (msg.type() === 'error') consoleErrors.push(msg.text());
     });
@@ -275,15 +332,6 @@ export async function getSubscriptionToken(
       );
     }
 
-    // Registered immediately before the click that triggers it — registering
-    // this any earlier let its timeout elapse in the background (while the
-    // slow reese84 wait/navigation above were still running) with nothing yet
-    // awaiting it, which crashed the whole process as an unhandled rejection
-    // instead of being caught, since nothing was listening for it in time.
-    const byPasswordResponse = page.waitForResponse(
-      (res) => res.url().includes(BY_PASSWORD_URL_PART),
-      { timeout: RESPONSE_TIMEOUT_MS },
-    );
     await page.getByRole('button', { name: 'Sign In', exact: true }).click();
 
     // Catches a transient validation error/toast that a screenshot taken only
@@ -295,22 +343,10 @@ export async function getSubscriptionToken(
       pageErrors,
     });
 
-    const response = await byPasswordResponse;
-    if (!response.ok()) {
-      throw new Error(
-        `F1 login rejected: ${response.status()} ${response.statusText()} — check credentials or account status.`,
-      );
-    }
-
-    const body = (await response.json()) as { data?: { subscriptionToken?: string } };
-    const token = body.data?.subscriptionToken;
-    if (!token) {
-      throw new Error(
-        'F1 login response did not include a subscriptionToken — F1 may have changed their login flow.',
-      );
-    }
-
-    return token;
+    return await waitForCapturedToken(
+      () => ({ token: capturedToken, failureReason: captureFailureReason }),
+      RESPONSE_TIMEOUT_MS,
+    );
   } catch (err) {
     let diagnosticsNote = 'diagnostics not captured (no page available)';
     if (page) {
