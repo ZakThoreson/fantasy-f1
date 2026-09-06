@@ -13,3 +13,7 @@ Thumbs.db
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+# Failure diagnostics (screenshots/page state) — uploaded as a CI artifact,
+# never committed, since a screenshot could show account details.
+fetch/diagnostics/

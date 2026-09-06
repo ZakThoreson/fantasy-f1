@@ -39,6 +39,16 @@ jobs:
           LEAGUE_ID: '4358307'
         run: npm run fetch -w fetch
 
+      # Screenshot + page state captured by auth.ts on failure, so a red run
+      # leaves something inspectable instead of just a bare timeout message.
+      - name: Upload failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: auth-failure-diagnostics
+          path: fetch/diagnostics/
+          retention-days: 14
+
       - name: Commit and push if data changed
         run: |
           git config user.name "github-actions[bot]"
