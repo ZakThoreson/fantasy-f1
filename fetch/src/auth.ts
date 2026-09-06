@@ -15,6 +15,42 @@ const REESE84_COOKIE_TIMEOUT_MS = 45_000;
 const REESE84_POLL_INTERVAL_MS = 1_000;
 
 /**
+ * F1 shows different consent/announcement overlays depending on domain,
+ * region, or session — an iframe-based one on fantasy.formula1.com, and a
+ * separate full-page modal ("YOUR CHOICES REGARDING COOKIES ON THIS SITE",
+ * with an "Accept All" button) confirmed via diagnostics to appear on
+ * account.formula1.com's login page specifically. Both cover the page with
+ * an overlay that intercepts real clicks (though not `.fill()`, which is why
+ * forms could be filled but Sign In clicks were silently swallowed). Try
+ * every known variant; each is best-effort and non-fatal if absent.
+ */
+async function dismissOverlays(page: Page): Promise<void> {
+  try {
+    await page
+      .frameLocator('iframe[title="SP Consent Message"]')
+      .getByRole('button', { name: /accept/i })
+      .click({ timeout: 5_000 });
+  } catch {
+    // Not shown — proceed.
+  }
+  try {
+    await page.getByRole('button', { name: /^accept all$/i }).click({ timeout: 5_000 });
+  } catch {
+    // Not shown — proceed.
+  }
+  try {
+    await page
+      .locator(
+        '.si-popup__wrap--announcement button, .si-popup__wrap--announcement .si-popup__close',
+      )
+      .first()
+      .click({ timeout: 3_000 });
+  } catch {
+    // Not shown — proceed.
+  }
+}
+
+/**
  * The login form is interactive (fillable) before Akamai's sensor JS has
  * actually finished and set the reese84 cookie — confirmed via diagnostics
  * showing a disabled/loading overlay on the Sign In button at that point.
@@ -126,33 +162,18 @@ export async function getSubscriptionToken(
     // through path may set session/referrer state a direct deep link skips,
     // so replicate the real user path instead of shortcutting it.
     await page.goto(FANTASY_HOME_URL, { waitUntil: 'load' });
-
-    // Best-effort cookie-consent / announcement-popup dismissal; non-fatal if
-    // absent (these vary and aren't load-bearing for the actual login).
-    try {
-      await page
-        .frameLocator('iframe[title="SP Consent Message"]')
-        .getByRole('button', { name: /accept/i })
-        .click({ timeout: 5_000 });
-    } catch {
-      // No consent dialog shown — proceed.
-    }
-    try {
-      await page
-        .locator(
-          '.si-popup__wrap--announcement button, .si-popup__wrap--announcement .si-popup__close',
-        )
-        .first()
-        .click({ timeout: 3_000 });
-    } catch {
-      // No announcement popup shown — proceed.
-    }
+    await dismissOverlays(page);
 
     await page
       .getByRole('button', { name: /^sign in$/i })
       .first()
       .click({ force: true });
     await page.waitForURL(/account\.formula1\.com/, { timeout: NAV_TIMEOUT_MS });
+
+    // account.formula1.com has shown its own separate consent modal (not the
+    // iframe one above) that overlays the whole login form — must be cleared
+    // here too, right before interacting with the form on this page.
+    await dismissOverlays(page);
 
     const loginField = page.locator('input[name="Login"]');
     const passwordField = page.locator('input[name="Password"]');
