@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { chromium, type Page } from 'playwright';
+import { chromium, type Locator, type Page } from 'playwright';
 import { redactError } from './redact.js';
 
 const LOGIN_URL =
@@ -8,39 +8,63 @@ const LOGIN_URL =
 const BY_PASSWORD_URL_PART = '/v2/account/subscriber/authenticate/by-password';
 const NAV_TIMEOUT_MS = 30_000;
 const RESPONSE_TIMEOUT_MS = 30_000;
+const FILL_RETRY_ATTEMPTS = 3;
 
 /**
- * On any failure, captures a screenshot + page state to `diagnostics/` so a
- * CI failure leaves behind something inspectable (is it a CAPTCHA? a changed
- * login form? a blank page?) instead of just a bare timeout message. Uploaded
- * as a workflow artifact by update-data.yml on failure — never committed to
- * the repo (see .gitignore) since a screenshot could show account details.
+ * React can reset a controlled input's DOM value back to its own state on a
+ * re-render shortly after page load (e.g. late hydration), silently undoing a
+ * `.fill()` with no error. Verify the value actually stuck and retry if not,
+ * pausing briefly to let the app finish settling before trying again.
  */
-async function captureDiagnostics(page: Page, outDir: string): Promise<string[]> {
+async function fillAndVerify(locator: Locator, value: string): Promise<boolean> {
+  for (let attempt = 1; attempt <= FILL_RETRY_ATTEMPTS; attempt++) {
+    await locator.fill(value);
+    if ((await locator.inputValue()) === value) {
+      return true;
+    }
+    await locator.page().waitForTimeout(500 * attempt);
+  }
+  return false;
+}
+
+/**
+ * Captures a screenshot + page state to `diagnostics/` so a failed CI run
+ * leaves behind something inspectable instead of just an error message.
+ * Uploaded as a workflow artifact by update-data.yml — never committed to the
+ * repo (see .gitignore) since a screenshot could show account details.
+ * Field contents are reported as filled/empty only, never the actual values.
+ */
+async function captureDiagnostics(
+  page: Page,
+  outDir: string,
+  label: string,
+  extra: Record<string, unknown> = {},
+): Promise<string[]> {
   await mkdir(outDir, { recursive: true });
   const notes: string[] = [];
 
   try {
-    await page.screenshot({ path: path.join(outDir, 'failure.png'), fullPage: true });
-    notes.push('screenshot saved');
+    await page.screenshot({ path: path.join(outDir, `${label}.png`), fullPage: true });
+    notes.push(`${label} screenshot saved`);
   } catch (e) {
-    notes.push(`screenshot failed: ${e instanceof Error ? e.message : String(e)}`);
+    notes.push(`${label} screenshot failed: ${e instanceof Error ? e.message : String(e)}`);
   }
 
   try {
     const cookies = await page.context().cookies();
-    const hasReese84 = cookies.some((c) => c.name === 'reese84');
     const summary = {
+      label,
       url: page.url(),
       title: await page.title().catch(() => '(unavailable)'),
-      hasReese84Cookie: hasReese84,
+      hasReese84Cookie: cookies.some((c) => c.name === 'reese84'),
       cookieNames: cookies.map((c) => c.name),
       timestamp: new Date().toISOString(),
+      ...extra,
     };
-    await writeFile(path.join(outDir, 'summary.json'), JSON.stringify(summary, null, 2), 'utf8');
-    notes.push(`page state: ${JSON.stringify(summary)}`);
+    await writeFile(path.join(outDir, `${label}.json`), JSON.stringify(summary, null, 2), 'utf8');
+    notes.push(`${label} state: ${JSON.stringify(summary)}`);
   } catch (e) {
-    notes.push(`state capture failed: ${e instanceof Error ? e.message : String(e)}`);
+    notes.push(`${label} state capture failed: ${e instanceof Error ? e.message : String(e)}`);
   }
 
   return notes;
@@ -74,7 +98,7 @@ export async function getSubscriptionToken(
       { timeout: RESPONSE_TIMEOUT_MS },
     );
 
-    await page.goto(LOGIN_URL, { waitUntil: 'domcontentloaded' });
+    await page.goto(LOGIN_URL, { waitUntil: 'load' });
 
     // Best-effort cookie-consent dismissal; non-fatal if absent (banner
     // preferences/domain behavior can vary and aren't load-bearing here).
@@ -87,8 +111,27 @@ export async function getSubscriptionToken(
       // No consent dialog shown — proceed.
     }
 
-    await page.locator('input[name="Login"]').fill(username);
-    await page.locator('input[name="Password"]').fill(password);
+    const loginField = page.locator('input[name="Login"]');
+    const passwordField = page.locator('input[name="Password"]');
+
+    const loginFilled = await fillAndVerify(loginField, username);
+    const passwordFilled = await fillAndVerify(passwordField, password);
+
+    // Always captured (not just on failure) — this is the one moment that
+    // would show whether the fields visually held their values right before
+    // submitting, which a later failure screenshot can no longer prove either
+    // way once the app has re-rendered.
+    await captureDiagnostics(page, diagnosticsDir, 'after-fill', {
+      loginFieldFilled: loginFilled,
+      passwordFieldFilled: passwordFilled,
+    });
+
+    if (!loginFilled || !passwordFilled) {
+      throw new Error(
+        `Could not get the login form to hold its values (login filled: ${loginFilled}, password filled: ${passwordFilled}) after ${FILL_RETRY_ATTEMPTS} attempts.`,
+      );
+    }
+
     await page.getByRole('button', { name: 'Sign In', exact: true }).click();
 
     const response = await byPasswordResponse;
@@ -110,9 +153,11 @@ export async function getSubscriptionToken(
   } catch (err) {
     let diagnosticsNote = 'diagnostics not captured (no page available)';
     if (page) {
-      const notes = await captureDiagnostics(page, diagnosticsDir).catch((e: unknown) => [
-        `diagnostics capture threw: ${e instanceof Error ? e.message : String(e)}`,
-      ]);
+      const notes = await captureDiagnostics(page, diagnosticsDir, 'failure').catch(
+        (e: unknown) => [
+          `diagnostics capture threw: ${e instanceof Error ? e.message : String(e)}`,
+        ],
+      );
       diagnosticsNote = notes.join('; ');
     }
     const original = err instanceof Error ? err.message : String(err);
