@@ -3,8 +3,7 @@ import path from 'node:path';
 import { chromium, type BrowserContext, type Locator, type Page } from 'playwright';
 import { redactError } from './redact.js';
 
-const LOGIN_URL =
-  'https://account.formula1.com/#/en/login?redirect=https%3A%2F%2Ffantasy.formula1.com%2Fen&lead_source=web_fantasy';
+const FANTASY_HOME_URL = 'https://fantasy.formula1.com/en/';
 const BY_PASSWORD_URL_PART = '/v2/account/subscriber/authenticate/by-password';
 const NAV_TIMEOUT_MS = 30_000;
 const RESPONSE_TIMEOUT_MS = 30_000;
@@ -125,10 +124,16 @@ export async function getSubscriptionToken(
       { timeout: RESPONSE_TIMEOUT_MS },
     );
 
-    await page.goto(LOGIN_URL, { waitUntil: 'load' });
+    // Deep-linking straight to account.formula1.com's login URL was never
+    // actually confirmed to work — every prior manual inspection reached that
+    // page by clicking through from fantasy.formula1.com's own Sign In
+    // button. Repeated silent form resets with no error suggest that click-
+    // through path may set session/referrer state a direct deep link skips,
+    // so replicate the real user path instead of shortcutting it.
+    await page.goto(FANTASY_HOME_URL, { waitUntil: 'load' });
 
-    // Best-effort cookie-consent dismissal; non-fatal if absent (banner
-    // preferences/domain behavior can vary and aren't load-bearing here).
+    // Best-effort cookie-consent / announcement-popup dismissal; non-fatal if
+    // absent (these vary and aren't load-bearing for the actual login).
     try {
       await page
         .frameLocator('iframe[title="SP Consent Message"]')
@@ -137,6 +142,22 @@ export async function getSubscriptionToken(
     } catch {
       // No consent dialog shown — proceed.
     }
+    try {
+      await page
+        .locator(
+          '.si-popup__wrap--announcement button, .si-popup__wrap--announcement .si-popup__close',
+        )
+        .first()
+        .click({ timeout: 3_000 });
+    } catch {
+      // No announcement popup shown — proceed.
+    }
+
+    await page
+      .getByRole('button', { name: /^sign in$/i })
+      .first()
+      .click({ force: true });
+    await page.waitForURL(/account\.formula1\.com/, { timeout: NAV_TIMEOUT_MS });
 
     const loginField = page.locator('input[name="Login"]');
     const passwordField = page.locator('input[name="Password"]');
@@ -171,6 +192,11 @@ export async function getSubscriptionToken(
     }
 
     await page.getByRole('button', { name: 'Sign In', exact: true }).click();
+
+    // Catches a transient validation error/toast that a screenshot taken only
+    // after the full response timeout would likely miss if it auto-dismisses.
+    await page.waitForTimeout(2_000);
+    await captureDiagnostics(page, diagnosticsDir, 'just-after-click');
 
     const response = await byPasswordResponse;
     if (!response.ok()) {
