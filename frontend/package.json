@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@fantasy-f1/shared": "*",
-    "typescript": "^5.7.2",
+    "typescript": "^7.0.2",
     "vite": "^8.2.2"
   }
 }
