@@ -186,6 +186,7 @@ async function captureDiagnostics(
 export async function getSubscriptionToken(
   username: string,
   password: string,
+  leagueId: string,
   diagnosticsDir = path.resolve(process.cwd(), 'diagnostics'),
 ): Promise<string> {
   // --disable-blink-features=AutomationControlled hides navigator.webdriver,
@@ -212,6 +213,12 @@ export async function getSubscriptionToken(
   // the next failure shows the actual exception instead of just its symptom.
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
+  // fantasy-api.formula1.com (the old, header-based API from years-old public
+  // docs) no longer even resolves via DNS — F1 migrated to
+  // fantasy.formula1.com/services/... with cookie-based sessions instead.
+  // Declared outside the try block so it's still readable from the catch's
+  // capture, same as the logs above.
+  const serviceCallBodies: Array<{ url: string; status: number; bodyPreview: string }> = [];
   try {
     // Playwright's default UA literally contains "HeadlessChrome/<version>",
     // an obvious tell that many bot-detection systems check for directly.
@@ -270,6 +277,29 @@ export async function getSubscriptionToken(
         } catch (e) {
           captureFailureReason = `Could not complete F1 login request: ${e instanceof Error ? e.message : String(e)}`;
           await route.abort().catch(() => undefined);
+        }
+      },
+    );
+
+    // Capture bodies of every /services/ call (login succeeded, but the real
+    // leaderboard endpoint under the new API is still unknown) so the next
+    // step — navigating to the leaderboard page — reveals it directly.
+    await page.route(
+      (url) => url.pathname.includes('/services/'),
+      async (route) => {
+        try {
+          const response = await route.fetch();
+          if (serviceCallBodies.length < 40) {
+            const text = await response.text().catch((e: unknown) => `<unreadable: ${String(e)}>`);
+            serviceCallBodies.push({
+              url: route.request().url(),
+              status: response.status(),
+              bodyPreview: text.slice(0, 3000),
+            });
+          }
+          await route.fulfill({ response });
+        } catch {
+          await route.continue().catch(() => undefined);
         }
       },
     );
@@ -350,10 +380,27 @@ export async function getSubscriptionToken(
       pageErrors,
     });
 
-    return await waitForCapturedToken(
+    const token = await waitForCapturedToken(
       () => ({ token: capturedToken, failureReason: captureFailureReason }),
       RESPONSE_TIMEOUT_MS,
     );
+
+    // Exploratory: the real leaderboard endpoint under the new
+    // fantasy.formula1.com/services/... API isn't known yet. Navigate there
+    // now, while still logged in, so serviceCallBodies captures whatever the
+    // page itself calls to render standings.
+    await page.goto(`https://fantasy.formula1.com/en/leagues/leaderboard/private/${leagueId}`, {
+      waitUntil: 'load',
+    });
+    await page.waitForTimeout(4_000);
+    await captureDiagnostics(page, diagnosticsDir, 'leaderboard-page', {
+      recentApiCalls: networkLog,
+      consoleErrors,
+      pageErrors,
+      serviceCallBodies,
+    });
+
+    return token;
   } catch (err) {
     let diagnosticsNote = 'diagnostics not captured (no page available)';
     if (page) {
@@ -361,6 +408,7 @@ export async function getSubscriptionToken(
         recentApiCalls: networkLog,
         consoleErrors,
         pageErrors,
+        serviceCallBodies,
       }).catch((e: unknown) => [
         `diagnostics capture threw: ${e instanceof Error ? e.message : String(e)}`,
       ]);

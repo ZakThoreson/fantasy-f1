@@ -21,7 +21,7 @@ async function main(): Promise<void> {
   }
 
   console.log(`Logging in to fetch data for league ${leagueId}...`);
-  const subscriptionToken = await getSubscriptionToken(username, password);
+  const subscriptionToken = await getSubscriptionToken(username, password, leagueId);
   const xF1CookieData = computeXF1CookieData(subscriptionToken);
   const client = new F1ApiClient(xF1CookieData);
 
