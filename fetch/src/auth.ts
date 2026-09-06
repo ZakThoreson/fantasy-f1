@@ -119,11 +119,6 @@ export async function getSubscriptionToken(
     page = await context.newPage();
     page.setDefaultTimeout(NAV_TIMEOUT_MS);
 
-    const byPasswordResponse = page.waitForResponse(
-      (res) => res.url().includes(BY_PASSWORD_URL_PART),
-      { timeout: RESPONSE_TIMEOUT_MS },
-    );
-
     // Deep-linking straight to account.formula1.com's login URL was never
     // actually confirmed to work — every prior manual inspection reached that
     // page by clicking through from fantasy.formula1.com's own Sign In
@@ -191,6 +186,15 @@ export async function getSubscriptionToken(
       );
     }
 
+    // Registered immediately before the click that triggers it — registering
+    // this any earlier let its timeout elapse in the background (while the
+    // slow reese84 wait/navigation above were still running) with nothing yet
+    // awaiting it, which crashed the whole process as an unhandled rejection
+    // instead of being caught, since nothing was listening for it in time.
+    const byPasswordResponse = page.waitForResponse(
+      (res) => res.url().includes(BY_PASSWORD_URL_PART),
+      { timeout: RESPONSE_TIMEOUT_MS },
+    );
     await page.getByRole('button', { name: 'Sign In', exact: true }).click();
 
     // Catches a transient validation error/toast that a screenshot taken only
