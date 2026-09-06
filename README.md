@@ -33,9 +33,12 @@ F1 publishes each private league's standings as static, publicly cached files �
 ```
 https://fantasy.formula1.com/feeds/leaderboard/privateleague/list_1_{leagueId}_0_1.json         # current standings
 https://fantasy.formula1.com/feeds/leaderboard/privateleague/list_2_{leagueId}_{round}_1.json    # one race's results
+https://fantasy.formula1.com/feeds/drivers/{round}_en.json                                       # driver + constructor prices for that round
 ```
 
-No login, cookies, or headers of any kind are required for either — confirmed with plain `curl` requests. They're served off S3/CloudFront alongside F1's other public reference feeds (schedules, driver lists), presumably so a league's standings can be shared or embedded without every viewer needing an F1 account. `fetch/src/fetchLeague.ts` reads the first; `fetch/src/fetchHistory.ts` probes `{round}` starting at 1 until a round 404s (i.e. that race hasn't happened yet) and reshapes every result found into `data/history.json`, which the frontend turns into cumulative point totals for the race-over-race chart.
+No login, cookies, or headers of any kind are required for any of these — confirmed with plain `curl` requests. They're served off S3/CloudFront alongside F1's other public reference feeds (schedules, driver lists), presumably so a league's standings can be shared or embedded without every viewer needing an F1 account. `fetch/src/fetchLeague.ts` reads the first and the third (to compute each entrant's "Value" — the combined current price of their 5 drivers + 2 constructors); `fetch/src/fetchHistory.ts` probes `{round}` starting at 1 until a round 404s (i.e. that race hasn't happened yet) and reshapes every result found into `data/history.json`, which the frontend turns into cumulative point totals for the race-over-race chart.
+
+The drivers feed has one quirk the others don't: an upcoming round's file can already exist with a 200 status but an _empty_ value array, rather than 404ing like the leaderboard feeds do. `fetchPlayerPrices.ts` treats an empty response the same as "doesn't exist yet" — otherwise the last real round's prices would get silently overwritten with nothing.
 
 This is deliberately much simpler than it first appears it needs to be. F1's actual authenticated API (`fantasy.formula1.com/services/...`) sits behind Akamai Bot Manager and requires a full browser-driven login to reach — that path was built, debugged, and made to work during this project's development, but was removed once these public feeds were discovered, since they give the same data with no credentials, no bot-detection fragility, and nothing to keep secret.
 
