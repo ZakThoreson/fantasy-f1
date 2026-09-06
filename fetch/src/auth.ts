@@ -6,6 +6,14 @@ import { redactError } from './redact.js';
 const FANTASY_HOME_URL = 'https://fantasy.formula1.com/en/';
 const BY_PASSWORD_URL_PART = '/v2/account/subscriber/authenticate/by-password';
 const NETWORK_LOG_MAX_ENTRIES = 100;
+const NAV_TIMEOUT_MS = 30_000;
+const RESPONSE_TIMEOUT_MS = 30_000;
+const FILL_RETRY_ATTEMPTS = 3;
+// Observed taking ~20-30s on GitHub-hosted runners (vs. near-instant on a
+// local dev machine) — plausibly Akamai adding friction for a datacenter/
+// headless client. Generous timeout with margin over what's been observed.
+const REESE84_COOKIE_TIMEOUT_MS = 45_000;
+const REESE84_POLL_INTERVAL_MS = 1_000;
 
 /**
  * A naive substring match on the full URL (e.g. /formula1\.com/.test(url))
@@ -22,14 +30,6 @@ function isRelevantHost(url: string): boolean {
     return false;
   }
 }
-const NAV_TIMEOUT_MS = 30_000;
-const RESPONSE_TIMEOUT_MS = 30_000;
-const FILL_RETRY_ATTEMPTS = 3;
-// Observed taking ~20-30s on GitHub-hosted runners (vs. near-instant on a
-// local dev machine) — plausibly Akamai adding friction for a datacenter/
-// headless client. Generous timeout with margin over what's been observed.
-const REESE84_COOKIE_TIMEOUT_MS = 45_000;
-const REESE84_POLL_INTERVAL_MS = 1_000;
 
 /**
  * F1 shows different consent/announcement overlays depending on domain,
@@ -174,6 +174,13 @@ export async function getSubscriptionToken(
   // instead of just "that one URL never matched." Declared outside the try
   // block so it's still readable from the catch block's diagnostics capture.
   const networkLog: Array<{ method: string; url: string; status: number }> = [];
+  // The "Sorry something went wrong" error banner appeared with zero new
+  // network calls firing — that's the signature of a React error boundary
+  // catching a client-side JS exception before the app ever calls the API,
+  // not a rejected login. Capture console errors and uncaught exceptions so
+  // the next failure shows the actual exception instead of just its symptom.
+  const consoleErrors: string[] = [];
+  const pageErrors: string[] = [];
   try {
     const context = await browser.newContext();
     page = await context.newPage();
@@ -184,6 +191,12 @@ export async function getSubscriptionToken(
         networkLog.push({ method: res.request().method(), url: res.url(), status: res.status() });
         if (networkLog.length > NETWORK_LOG_MAX_ENTRIES) networkLog.shift();
       }
+    });
+    page.on('console', (msg) => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text());
+    });
+    page.on('pageerror', (err) => {
+      pageErrors.push(err.message);
     });
 
     // Deep-linking straight to account.formula1.com's login URL was never
@@ -220,6 +233,8 @@ export async function getSubscriptionToken(
       loginFieldFilled: loginFilled,
       passwordFieldFilled: passwordFilled,
       recentApiCalls: networkLog,
+      consoleErrors,
+      pageErrors,
     });
 
     if (!loginFilled || !passwordFilled) {
@@ -233,6 +248,8 @@ export async function getSubscriptionToken(
       reese84WaitedMs: reese84.waitedMs,
       reese84Found: reese84.found,
       recentApiCalls: networkLog,
+      consoleErrors,
+      pageErrors,
     });
     if (!reese84.found) {
       throw new Error(
@@ -256,6 +273,8 @@ export async function getSubscriptionToken(
     await page.waitForTimeout(2_000);
     await captureDiagnostics(page, diagnosticsDir, 'just-after-click', {
       recentApiCalls: networkLog,
+      consoleErrors,
+      pageErrors,
     });
 
     const response = await byPasswordResponse;
@@ -279,6 +298,8 @@ export async function getSubscriptionToken(
     if (page) {
       const notes = await captureDiagnostics(page, diagnosticsDir, 'failure', {
         recentApiCalls: networkLog,
+        consoleErrors,
+        pageErrors,
       }).catch((e: unknown) => [
         `diagnostics capture threw: ${e instanceof Error ? e.message : String(e)}`,
       ]);
