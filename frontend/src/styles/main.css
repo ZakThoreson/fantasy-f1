@@ -57,6 +57,80 @@ h1 {
   font-size: 0.8rem;
 }
 
+.podium {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin: 1.5rem 0 2.5rem;
+}
+
+.podium-card {
+  background: var(--row-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 0.75rem;
+  text-align: center;
+  min-width: 0;
+}
+
+.podium-1 {
+  border-color: var(--accent);
+}
+
+.podium-place {
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.podium-team {
+  font-weight: 700;
+  margin-top: 0.3rem;
+  overflow-wrap: break-word;
+}
+
+.podium-owner {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 0.1rem;
+}
+
+.podium-points {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
+}
+
+.podium-delta {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 0.2rem;
+}
+
+.podium-delta.positive {
+  color: #16a34a;
+}
+
+.podium-delta.negative {
+  color: var(--accent);
+}
+
+@media (max-width: 420px) {
+  .podium {
+    grid-template-columns: 1fr;
+  }
+}
+
+.standings-table-wrap {
+  overflow-x: auto;
+}
+
+.standings-table {
+  white-space: nowrap;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -114,11 +188,13 @@ th:nth-child(2) {
   color: var(--accent);
 }
 
-.history-chart {
+.history-chart,
+.standings-section {
   margin-top: 2.5rem;
 }
 
-.history-chart h2 {
+.history-chart h2,
+.standings-section h2 {
   font-size: 1.1rem;
   margin: 0 0 0.75rem;
 }
