@@ -1,5 +1,6 @@
 import { writeFile } from 'node:fs/promises';
 import type { LeaderboardEntrant, LeagueStandingsFile } from '@fantasy-f1/shared';
+import { fetchLatestPlayerPrices } from './fetchPlayerPrices.js';
 
 interface RawEntrant {
   trend: number;
@@ -8,6 +9,7 @@ interface RawEntrant {
   team_name: string;
   user_name: string;
   cur_points: number;
+  user_team: string[];
 }
 
 interface RawFeedResponse {
@@ -30,7 +32,13 @@ export function firstNameOf(fullName: string): string {
   return fullName.trim().split(/\s+/)[0] ?? fullName;
 }
 
-function mapEntrant(raw: RawEntrant): LeaderboardEntrant {
+/** Sums a roster's current prices; unknown player IDs contribute 0 rather than throwing, since a stale/missing price shouldn't take down the whole fetch. Rounded to 1dp to avoid floating-point noise (e.g. 109.60000000000001). */
+export function computeTeamValue(playerIds: string[], prices: Map<string, number>): number {
+  const total = playerIds.reduce((sum, id) => sum + (prices.get(id) ?? 0), 0);
+  return Math.round(total * 10) / 10;
+}
+
+function mapEntrant(raw: RawEntrant, prices: Map<string, number>): LeaderboardEntrant {
   return {
     userId: raw.social_id,
     rank: raw.cur_rank,
@@ -38,6 +46,7 @@ function mapEntrant(raw: RawEntrant): LeaderboardEntrant {
     teamName: decodeF1String(raw.team_name),
     firstName: firstNameOf(raw.user_name),
     trend: raw.trend,
+    teamValue: computeTeamValue(raw.user_team, prices),
   };
 }
 
@@ -56,13 +65,15 @@ export async function fetchLeagueStandings(
   outPath: string,
 ): Promise<void> {
   const url = `https://fantasy.formula1.com/feeds/leaderboard/privateleague/list_1_${encodeURIComponent(leagueId)}_0_1.json`;
-  const res = await fetch(url);
+  const [res, prices] = await Promise.all([fetch(url), fetchLatestPlayerPrices()]);
   if (!res.ok) {
     throw new Error(`F1 leaderboard feed request failed: ${res.status} ${res.statusText}`);
   }
 
   const raw = (await res.json()) as RawFeedResponse;
-  const entrants = raw.Value.leaderboard.map(mapEntrant).sort((a, b) => a.rank - b.rank);
+  const entrants = raw.Value.leaderboard
+    .map((e) => mapEntrant(e, prices))
+    .sort((a, b) => a.rank - b.rank);
   const scores = entrants.map((e) => e.score);
 
   const file: LeagueStandingsFile = {

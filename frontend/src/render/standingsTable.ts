@@ -25,10 +25,12 @@ export function renderStandingsTable(
   const headRow = document.createElement('tr');
   const columns = ['', 'Rank', 'Team', 'Owner', 'Score'];
   if (lastRacePoints) columns.push('Last Race');
+  columns.push('Value');
   for (const label of columns) {
     const th = document.createElement('th');
     th.textContent = label;
-    if (label === 'Score' || label === 'Last Race') th.classList.add('numeric');
+    if (label === 'Score' || label === 'Last Race' || label === 'Value')
+      th.classList.add('numeric');
     headRow.append(th);
   }
   thead.append(headRow);
@@ -67,6 +69,11 @@ export function renderStandingsTable(
       lastRaceCell.textContent = points === undefined ? '—' : String(points);
       row.append(lastRaceCell);
     }
+
+    const valueCell = document.createElement('td');
+    valueCell.className = 'numeric';
+    valueCell.textContent = `$${entrant.teamValue.toFixed(1)}M`;
+    row.append(valueCell);
 
     tbody.append(row);
   }

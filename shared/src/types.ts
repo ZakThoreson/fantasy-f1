@@ -18,6 +18,8 @@ export interface LeaderboardEntrant {
   firstName: string;
   /** -1, 0, or 1 — rank movement since the feed's previous update. */
   trend: number;
+  /** Combined current fantasy price ($M) of the entrant's 5 drivers + 2 constructors. */
+  teamValue: number;
 }
 
 export interface LeagueStandingsFile {
