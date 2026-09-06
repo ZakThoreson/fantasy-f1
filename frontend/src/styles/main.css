@@ -348,3 +348,12 @@ footer {
   font-size: 0.8rem;
   text-align: center;
 }
+
+footer a {
+  color: var(--muted);
+}
+
+footer a:hover,
+footer a:focus-visible {
+  color: var(--fg);
+}
