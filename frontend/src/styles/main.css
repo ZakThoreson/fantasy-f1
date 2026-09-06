@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Racing Sans One';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/RacingSansOne-Regular.woff2') format('woff2');
+}
+
 :root {
   color-scheme: light dark;
   --bg: #f7f7f8;
@@ -6,6 +14,7 @@
   --border: #d9dbe0;
   --row-alt: #eef0f4;
   --accent: #e10600;
+  --font-display: 'Racing Sans One', system-ui, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -44,12 +53,42 @@ h1 {
   margin: 0 0 0.25rem;
   border-bottom: 3px solid var(--accent);
   padding-bottom: 0.5rem;
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  font-size: 2rem;
 }
 
 .meta {
   color: var(--muted);
   margin: 0 0 1.5rem;
   font-size: 0.9rem;
+}
+
+.meta-freshness {
+  display: flex;
+  align-items: center;
+}
+
+.freshness-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  margin-right: 0.45rem;
+  flex-shrink: 0;
+}
+
+.freshness-fresh {
+  background: #16a34a;
+}
+
+.freshness-aging {
+  background: #d97706;
+}
+
+.freshness-stale {
+  background: var(--accent);
 }
 
 .value-note {
@@ -79,10 +118,10 @@ h1 {
 
 .podium-place {
   color: var(--muted);
-  font-size: 0.75rem;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 700;
+  letter-spacing: 0.08em;
 }
 
 .podium-team {
@@ -184,8 +223,119 @@ th:nth-child(2) {
   color: var(--muted);
 }
 
-.error {
-  color: var(--accent);
+.error-card {
+  max-width: 420px;
+  margin: 3rem auto 0;
+  padding: 1.5rem;
+  text-align: center;
+  background: var(--row-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.error-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.error-card h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.error-card p {
+  margin: 0 0 1rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.error-retry {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.error-retry:hover {
+  opacity: 0.9;
+}
+
+.error-retry:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+}
+
+.skeleton-line,
+.skeleton-card,
+.skeleton-row,
+.skeleton-chart {
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--row-alt) 25%, var(--border) 37%, var(--row-alt) 63%);
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+}
+
+.skeleton-title {
+  height: 1.8rem;
+  width: 60%;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-meta {
+  height: 0.9rem;
+  width: 40%;
+  margin-bottom: 1.5rem;
+}
+
+.skeleton-podium {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+}
+
+.skeleton-card {
+  height: 110px;
+}
+
+.skeleton-chart {
+  height: 220px;
+  margin-bottom: 2.5rem;
+}
+
+.skeleton-row {
+  height: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 420px) {
+  .skeleton-podium {
+    grid-template-columns: 1fr;
+  }
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-line,
+  .skeleton-card,
+  .skeleton-row,
+  .skeleton-chart {
+    animation: none;
+    background: var(--row-alt);
+  }
 }
 
 .history-chart,
@@ -195,7 +345,10 @@ th:nth-child(2) {
 
 .history-chart h2,
 .standings-section h2 {
-  font-size: 1.1rem;
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  font-size: 1.2rem;
   margin: 0 0 0.75rem;
 }
 
