@@ -26,6 +26,8 @@ interface RawLeaderboardResponse {
   };
 }
 
+// Deliberately does not carry raw.last_name into our output — see the
+// doc comment on LeaderboardEntrant in shared/src/types.ts.
 function mapEntrant(raw: RawEntrant): LeaderboardEntrant {
   return {
     userId: String(raw.user_id),
@@ -33,7 +35,6 @@ function mapEntrant(raw: RawEntrant): LeaderboardEntrant {
     score: raw.score,
     teamName: raw.team_name,
     firstName: raw.first_name,
-    lastName: raw.last_name,
     username: raw.username,
     userCountry: raw.user_country,
     isVerifiedEntrant: raw.is_verified_entrant,

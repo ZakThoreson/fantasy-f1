@@ -14,12 +14,13 @@ interface RawLeagueEntrantsResponse {
   league_entrants: RawEntrant[];
 }
 
+// Deliberately does not carry raw.last_name into our output — see the
+// doc comment on LeaderboardEntrant in shared/src/types.ts.
 function mapEntrant(raw: RawEntrant): EntrantSummary {
   return {
     userId: String(raw.user_id),
     teamName: raw.team_name,
     firstName: raw.first_name,
-    lastName: raw.last_name,
     username: raw.username,
   };
 }

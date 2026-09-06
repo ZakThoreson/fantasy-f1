@@ -41,8 +41,9 @@ export function renderStandingsTable(data: LeagueStandingsFile): HTMLElement {
     row.append(teamCell);
 
     const ownerCell = document.createElement('td');
-    const ownerName = [entrant.firstName, entrant.lastName].filter(Boolean).join(' ');
-    ownerCell.textContent = entrant.username ? `${ownerName} (@${entrant.username})` : ownerName;
+    ownerCell.textContent = entrant.username
+      ? `${entrant.firstName} (@${entrant.username})`
+      : entrant.firstName;
     row.append(ownerCell);
 
     const scoreCell = document.createElement('td');

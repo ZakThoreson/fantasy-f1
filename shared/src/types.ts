@@ -3,6 +3,11 @@
  * `frontend` package (reader, runs in the browser). These shapes are OUR OWN
  * clean schema, remapped from F1's undocumented API response by the fetch
  * package — the frontend should never need to know about F1's raw field names.
+ *
+ * Deliberately excludes last names: this site is public, and F1's private
+ * leagues are normally only visible to logged-in league members. First name +
+ * team name is enough to be recognizable within the league without publishing
+ * a league mate's full real name to the open internet.
  */
 
 export interface LeaderboardEntrant {
@@ -11,7 +16,6 @@ export interface LeaderboardEntrant {
   score: number;
   teamName: string;
   firstName: string;
-  lastName: string;
   username: string | null;
   userCountry: string;
   isVerifiedEntrant: boolean;
@@ -33,7 +37,6 @@ export interface EntrantSummary {
   userId: string;
   teamName: string;
   firstName: string;
-  lastName: string;
   username: string | null;
 }
 
