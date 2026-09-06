@@ -10,17 +10,19 @@ export function renderStandingsTable(
   lastRacePoints: Map<string, number> | null,
 ): HTMLElement {
   const container = document.createElement('section');
+  container.className = 'standings-section';
 
-  const heading = document.createElement('h1');
-  heading.textContent = data.leagueName;
+  const heading = document.createElement('h2');
+  heading.textContent = 'Standings';
   container.append(heading);
 
-  const meta = document.createElement('p');
-  meta.className = 'meta';
-  meta.textContent = `${data.entrantsCount} entrants · updated ${new Date(data.fetchedAt).toLocaleString()}`;
-  container.append(meta);
+  // Wrapped for horizontal scroll on narrow screens — up to 7 columns is too
+  // tight to shrink to a phone width without either scroll or dropping data.
+  const scrollWrap = document.createElement('div');
+  scrollWrap.className = 'standings-table-wrap';
 
   const table = document.createElement('table');
+  table.className = 'standings-table';
   const thead = document.createElement('thead');
   const headRow = document.createElement('tr');
   const columns = ['', 'Rank', 'Team', 'Owner', 'Score'];
@@ -78,7 +80,8 @@ export function renderStandingsTable(
     tbody.append(row);
   }
   table.append(tbody);
-  container.append(table);
+  scrollWrap.append(table);
+  container.append(scrollWrap);
 
   const valueNote = document.createElement('p');
   valueNote.className = 'meta value-note';
