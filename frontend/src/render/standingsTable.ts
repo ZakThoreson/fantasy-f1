@@ -1,8 +1,8 @@
 import type { LeagueStandingsFile } from '@fantasy-f1/shared';
 
 /**
- * All entrant fields (team name, owner name, username) come from other league
- * members via F1's API and are rendered here with textContent only — never
+ * All entrant fields (team name, owner name) come from other league members
+ * via F1's API and are rendered here with textContent only — never
  * innerHTML — so a malicious display name can't inject markup/scripts.
  */
 export function renderStandingsTable(data: LeagueStandingsFile): HTMLElement {
@@ -20,7 +20,7 @@ export function renderStandingsTable(data: LeagueStandingsFile): HTMLElement {
   const table = document.createElement('table');
   const thead = document.createElement('thead');
   const headRow = document.createElement('tr');
-  for (const label of ['Rank', 'Team', 'Owner', 'Score']) {
+  for (const label of ['', 'Rank', 'Team', 'Owner', 'Score']) {
     const th = document.createElement('th');
     th.textContent = label;
     headRow.append(th);
@@ -32,6 +32,11 @@ export function renderStandingsTable(data: LeagueStandingsFile): HTMLElement {
   for (const entrant of data.entrants) {
     const row = document.createElement('tr');
 
+    const trendCell = document.createElement('td');
+    trendCell.className = `trend trend-${entrant.trend > 0 ? 'up' : entrant.trend < 0 ? 'down' : 'flat'}`;
+    trendCell.textContent = entrant.trend > 0 ? '▲' : entrant.trend < 0 ? '▼' : '–';
+    row.append(trendCell);
+
     const rankCell = document.createElement('td');
     rankCell.textContent = String(entrant.rank);
     row.append(rankCell);
@@ -41,9 +46,7 @@ export function renderStandingsTable(data: LeagueStandingsFile): HTMLElement {
     row.append(teamCell);
 
     const ownerCell = document.createElement('td');
-    ownerCell.textContent = entrant.username
-      ? `${entrant.firstName} (@${entrant.username})`
-      : entrant.firstName;
+    ownerCell.textContent = entrant.firstName;
     row.append(ownerCell);
 
     const scoreCell = document.createElement('td');

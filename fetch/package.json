@@ -9,8 +9,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@fantasy-f1/shared": "*",
-    "playwright": "^1.49.1"
+    "@fantasy-f1/shared": "*"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

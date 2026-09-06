@@ -1,6 +1,0 @@
-{
-  "fetchedAt": "2026-01-01T00:00:00.000Z",
-  "leagueId": "4358307",
-  "schemaNote": "Raw, unmapped F1 API response — schema not yet confirmed. See shared/src/types.ts HistoryFile. This is placeholder seed data, not a real API response.",
-  "raw": null
-}
