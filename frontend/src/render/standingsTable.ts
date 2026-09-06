@@ -80,5 +80,11 @@ export function renderStandingsTable(
   table.append(tbody);
   container.append(table);
 
+  const valueNote = document.createElement('p');
+  valueNote.className = 'meta value-note';
+  valueNote.textContent =
+    'Value is each team\'s current roster price (5 drivers + 2 constructors), not what it cost to build — it rises as good picks appreciate over the season, and can jump well past the normal budget cap in a week a team plays F1 Fantasy\'s "Limitless" chip.';
+  container.append(valueNote);
+
   return container;
 }
