@@ -8,6 +8,12 @@ updates:
       npm-deps:
         patterns:
           - '*'
+    ignore:
+      # @typescript-eslint v8's peer dependency caps at typescript <6.1.0, so a
+      # major TS bump breaks `npm ci` (ERESOLVE) until typescript-eslint adds
+      # support. Revisit once @typescript-eslint/* raises that ceiling.
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: github-actions
     directory: /
