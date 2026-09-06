@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { chromium, type Locator, type Page } from 'playwright';
+import { chromium, type BrowserContext, type Locator, type Page } from 'playwright';
 import { redactError } from './redact.js';
 
 const LOGIN_URL =
@@ -9,6 +9,33 @@ const BY_PASSWORD_URL_PART = '/v2/account/subscriber/authenticate/by-password';
 const NAV_TIMEOUT_MS = 30_000;
 const RESPONSE_TIMEOUT_MS = 30_000;
 const FILL_RETRY_ATTEMPTS = 3;
+// Observed taking ~20-30s on GitHub-hosted runners (vs. near-instant on a
+// local dev machine) — plausibly Akamai adding friction for a datacenter/
+// headless client. Generous timeout with margin over what's been observed.
+const REESE84_COOKIE_TIMEOUT_MS = 45_000;
+const REESE84_POLL_INTERVAL_MS = 1_000;
+
+/**
+ * The login form is interactive (fillable) before Akamai's sensor JS has
+ * actually finished and set the reese84 cookie — confirmed via diagnostics
+ * showing a disabled/loading overlay on the Sign In button at that point.
+ * Clicking before reese84 exists submits nothing useful. Poll for it instead
+ * of assuming any fixed page-load event means the page is truly ready.
+ */
+async function waitForReese84Cookie(
+  context: BrowserContext,
+  timeoutMs: number,
+): Promise<{ found: boolean; waitedMs: number }> {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    const cookies = await context.cookies();
+    if (cookies.some((c) => c.name === 'reese84')) {
+      return { found: true, waitedMs: Date.now() - start };
+    }
+    await new Promise((resolve) => setTimeout(resolve, REESE84_POLL_INTERVAL_MS));
+  }
+  return { found: false, waitedMs: Date.now() - start };
+}
 
 /**
  * React can reset a controlled input's DOM value back to its own state on a
@@ -129,6 +156,17 @@ export async function getSubscriptionToken(
     if (!loginFilled || !passwordFilled) {
       throw new Error(
         `Could not get the login form to hold its values (login filled: ${loginFilled}, password filled: ${passwordFilled}) after ${FILL_RETRY_ATTEMPTS} attempts.`,
+      );
+    }
+
+    const reese84 = await waitForReese84Cookie(context, REESE84_COOKIE_TIMEOUT_MS);
+    await captureDiagnostics(page, diagnosticsDir, 'before-submit', {
+      reese84WaitedMs: reese84.waitedMs,
+      reese84Found: reese84.found,
+    });
+    if (!reese84.found) {
+      throw new Error(
+        `Timed out after ${REESE84_COOKIE_TIMEOUT_MS}ms waiting for Akamai's reese84 cookie — it never arrived, so submitting would be pointless. Akamai may be blocking this runner outright rather than just being slow.`,
       );
     }
 
