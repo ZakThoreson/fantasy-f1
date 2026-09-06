@@ -235,37 +235,44 @@ export async function getSubscriptionToken(
     });
 
     // A prior run proved the by-password call itself succeeds, but the app
-    // immediately redirects back to fantasy.formula1.com on success — by the
-    // time `await page.waitForResponse(...)` resolved and code went on to
-    // call `.json()` in a later step, the browser had already navigated away
-    // and Chrome could no longer retrieve the response body ("Response body
-    // is not available for a response that was navigated away from"). Read
-    // the body eagerly, inside this handler, the instant the response
-    // arrives — the earliest point possible, before navigation can occur.
+    // redirects back to fantasy.formula1.com essentially immediately on
+    // success. Reading the body off the live page response — even eagerly,
+    // inside a page.on('response', ...) handler — still lost the race: res.
+    // json() is itself an async round-trip to the browser process
+    // (Network.getResponseBody over CDP), and Chrome had already discarded
+    // the resource by the time it resolved ("Response body is not available
+    // for a response that was navigated away from"). Intercepting the
+    // request instead sidesteps this entirely: route.fetch() performs the
+    // real request via Playwright's own APIRequestContext (fully buffered,
+    // not tied to the page's live CDP session), and route.fulfill() then
+    // hands that exact response back to the page so its own success
+    // handling/redirect proceeds completely normally.
     let capturedToken: string | undefined;
     let captureFailureReason: string | undefined;
-    page.on('response', (res) => {
-      if (!res.url().includes(BY_PASSWORD_URL_PART)) return;
-      if (!res.ok()) {
-        captureFailureReason = `F1 login rejected: ${res.status()} ${res.statusText()} — check credentials or account status.`;
-        return;
-      }
-      res.json().then(
-        (parsedBody: unknown) => {
-          const token = (parsedBody as { data?: { subscriptionToken?: string } })?.data
-            ?.subscriptionToken;
-          if (token) {
-            capturedToken = token;
+    await page.route(
+      (url) => url.pathname.endsWith(BY_PASSWORD_URL_PART),
+      async (route) => {
+        try {
+          const response = await route.fetch();
+          if (!response.ok()) {
+            captureFailureReason = `F1 login rejected: ${response.status()} ${response.statusText()} — check credentials or account status.`;
           } else {
-            captureFailureReason =
-              'F1 login response did not include a subscriptionToken — F1 may have changed their login flow.';
+            const parsedBody = (await response.json()) as { data?: { subscriptionToken?: string } };
+            const token = parsedBody.data?.subscriptionToken;
+            if (token) {
+              capturedToken = token;
+            } else {
+              captureFailureReason =
+                'F1 login response did not include a subscriptionToken — F1 may have changed their login flow.';
+            }
           }
-        },
-        (err: unknown) => {
-          captureFailureReason = `Could not read F1 login response body: ${err instanceof Error ? err.message : String(err)}`;
-        },
-      );
-    });
+          await route.fulfill({ response });
+        } catch (e) {
+          captureFailureReason = `Could not complete F1 login request: ${e instanceof Error ? e.message : String(e)}`;
+          await route.abort().catch(() => undefined);
+        }
+      },
+    );
 
     page.on('console', (msg) => {
       if (msg.type() === 'error') consoleErrors.push(msg.text());
