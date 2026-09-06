@@ -8,12 +8,3 @@ frontend/public/data/*.json
 npm-debug.log*
 .DS_Store
 Thumbs.db
-
-# Playwright
-/test-results/
-/playwright-report/
-/playwright/.cache/
-
-# Failure diagnostics (screenshots/page state) — uploaded as a CI artifact,
-# never committed, since a screenshot could show account details.
-fetch/diagnostics/

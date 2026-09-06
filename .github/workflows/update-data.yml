@@ -1,13 +1,11 @@
 name: Update League Data
 
 on:
-  # F1's Actions cron can't know real race dates, so this fires a handful of
-  # times across Fri/Sat/Sun UTC to cover most race sessions worldwide. Extra
-  # runs on non-race weekends are cheap: the commit step is a no-op when the
-  # fetched data hasn't changed. Fall back to manual runs (workflow_dispatch)
-  # for anything this misses.
+  # No login/credentials involved (see fetchLeague.ts) — just a plain public
+  # HTTP request — so there's no downside to polling regularly. The commit
+  # step is a no-op when the fetched data hasn't changed.
   schedule:
-    - cron: '0 6,12,18,22 * * 5,6,0'
+    - cron: '0 */6 * * *'
   workflow_dispatch: {}
 
 permissions:
@@ -29,28 +27,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
-
       - name: Fetch league data
         env:
-          F1_USERNAME: ${{ secrets.F1_USERNAME }}
-          F1_PASSWORD: ${{ secrets.F1_PASSWORD }}
           LEAGUE_ID: '4358307'
+          LEAGUE_NAME: "The Paddock Club '26"
         run: npm run fetch -w fetch
-
-      # auth.ts always captures an after-fill screenshot (and a failure
-      # screenshot if it didn't get that far), so upload regardless of outcome
-      # rather than only on failure() — this is what lets us see whether the
-      # login form actually held its values right before submitting.
-      - name: Upload auth diagnostics
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: auth-diagnostics
-          path: fetch/diagnostics/
-          if-no-files-found: ignore
-          retention-days: 14
 
       - name: Commit and push if data changed
         run: |
