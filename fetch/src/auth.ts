@@ -165,14 +165,22 @@ export async function getSubscriptionToken(
   password: string,
   diagnosticsDir = path.resolve(process.cwd(), 'diagnostics'),
 ): Promise<string> {
-  const browser = await chromium.launch({ headless: true });
+  // --disable-blink-features=AutomationControlled hides navigator.webdriver,
+  // a flag many bot-detection systems check directly and one Playwright's
+  // default launch leaves set to true. Confirmed via diagnostics that the
+  // by-password XHR itself gets blocked (400, no CORS header — the signature
+  // of an edge/WAF rejection, not a real CORS misconfig) specifically when
+  // run from this environment, so reducing obvious automation fingerprints
+  // is worth trying before concluding cloud CI can't do this at all.
+  const browser = await chromium.launch({
+    headless: true,
+    args: ['--disable-blink-features=AutomationControlled'],
+  });
   let page: Page | undefined;
-  // The specific by-password URL below is years-old public documentation and
-  // was never actually confirmed against the live site — repeated timeouts
-  // waiting for it suggest F1 may call something else entirely now. Log every
-  // formula1.com/Akamai response so a failure shows what actually happened
-  // instead of just "that one URL never matched." Declared outside the try
-  // block so it's still readable from the catch block's diagnostics capture.
+  // The by-password URL is confirmed correct (seen live in a CORS error) —
+  // log every formula1.com/Akamai response anyway so a future failure shows
+  // the full picture, not just whether that one call happened. Declared
+  // outside the try block so it's still readable from the catch's capture.
   const networkLog: Array<{ method: string; url: string; status: number }> = [];
   // The "Sorry something went wrong" error banner appeared with zero new
   // network calls firing — that's the signature of a React error boundary
@@ -182,7 +190,17 @@ export async function getSubscriptionToken(
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
   try {
-    const context = await browser.newContext();
+    // Playwright's default UA literally contains "HeadlessChrome/<version>",
+    // an obvious tell that many bot-detection systems check for directly.
+    // Swap in the real browser's own version so it stays consistent with
+    // whatever Chromium build Playwright actually bundles, rather than
+    // hardcoding a version string that could drift out of sync.
+    const userAgent = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${browser.version()} Safari/537.36`;
+    const context = await browser.newContext({
+      userAgent,
+      viewport: { width: 1366, height: 768 },
+      locale: 'en-US',
+    });
     page = await context.newPage();
     page.setDefaultTimeout(NAV_TIMEOUT_MS);
 
