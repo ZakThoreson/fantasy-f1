@@ -5,6 +5,8 @@ import { redactError } from './redact.js';
 
 const FANTASY_HOME_URL = 'https://fantasy.formula1.com/en/';
 const BY_PASSWORD_URL_PART = '/v2/account/subscriber/authenticate/by-password';
+const NETWORK_LOG_HOST_FILTER = /formula1\.com|akamai/i;
+const NETWORK_LOG_MAX_ENTRIES = 100;
 const NAV_TIMEOUT_MS = 30_000;
 const RESPONSE_TIMEOUT_MS = 30_000;
 const FILL_RETRY_ATTEMPTS = 3;
@@ -150,10 +152,24 @@ export async function getSubscriptionToken(
 ): Promise<string> {
   const browser = await chromium.launch({ headless: true });
   let page: Page | undefined;
+  // The specific by-password URL below is years-old public documentation and
+  // was never actually confirmed against the live site — repeated timeouts
+  // waiting for it suggest F1 may call something else entirely now. Log every
+  // formula1.com/Akamai response so a failure shows what actually happened
+  // instead of just "that one URL never matched." Declared outside the try
+  // block so it's still readable from the catch block's diagnostics capture.
+  const networkLog: Array<{ method: string; url: string; status: number }> = [];
   try {
     const context = await browser.newContext();
     page = await context.newPage();
     page.setDefaultTimeout(NAV_TIMEOUT_MS);
+
+    page.on('response', (res) => {
+      if (NETWORK_LOG_HOST_FILTER.test(res.url())) {
+        networkLog.push({ method: res.request().method(), url: res.url(), status: res.status() });
+        if (networkLog.length > NETWORK_LOG_MAX_ENTRIES) networkLog.shift();
+      }
+    });
 
     // Deep-linking straight to account.formula1.com's login URL was never
     // actually confirmed to work — every prior manual inspection reached that
@@ -188,6 +204,7 @@ export async function getSubscriptionToken(
     await captureDiagnostics(page, diagnosticsDir, 'after-fill', {
       loginFieldFilled: loginFilled,
       passwordFieldFilled: passwordFilled,
+      recentApiCalls: networkLog,
     });
 
     if (!loginFilled || !passwordFilled) {
@@ -200,6 +217,7 @@ export async function getSubscriptionToken(
     await captureDiagnostics(page, diagnosticsDir, 'before-submit', {
       reese84WaitedMs: reese84.waitedMs,
       reese84Found: reese84.found,
+      recentApiCalls: networkLog,
     });
     if (!reese84.found) {
       throw new Error(
@@ -221,7 +239,9 @@ export async function getSubscriptionToken(
     // Catches a transient validation error/toast that a screenshot taken only
     // after the full response timeout would likely miss if it auto-dismisses.
     await page.waitForTimeout(2_000);
-    await captureDiagnostics(page, diagnosticsDir, 'just-after-click');
+    await captureDiagnostics(page, diagnosticsDir, 'just-after-click', {
+      recentApiCalls: networkLog,
+    });
 
     const response = await byPasswordResponse;
     if (!response.ok()) {
@@ -242,11 +262,11 @@ export async function getSubscriptionToken(
   } catch (err) {
     let diagnosticsNote = 'diagnostics not captured (no page available)';
     if (page) {
-      const notes = await captureDiagnostics(page, diagnosticsDir, 'failure').catch(
-        (e: unknown) => [
-          `diagnostics capture threw: ${e instanceof Error ? e.message : String(e)}`,
-        ],
-      );
+      const notes = await captureDiagnostics(page, diagnosticsDir, 'failure', {
+        recentApiCalls: networkLog,
+      }).catch((e: unknown) => [
+        `diagnostics capture threw: ${e instanceof Error ? e.message : String(e)}`,
+      ]);
       diagnosticsNote = notes.join('; ');
     }
     const original = err instanceof Error ? err.message : String(err);
