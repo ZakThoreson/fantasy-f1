@@ -5,8 +5,23 @@ import { redactError } from './redact.js';
 
 const FANTASY_HOME_URL = 'https://fantasy.formula1.com/en/';
 const BY_PASSWORD_URL_PART = '/v2/account/subscriber/authenticate/by-password';
-const NETWORK_LOG_HOST_FILTER = /formula1\.com|akamai/i;
 const NETWORK_LOG_MAX_ENTRIES = 100;
+
+/**
+ * A naive substring match on the full URL (e.g. /formula1\.com/.test(url))
+ * was previously flooded out by third-party trackers (New Relic, Meta Pixel,
+ * Google Ads, DoubleClick) that embed "account.formula1.com" inside their own
+ * query-string parameters (ref=, domain=, url=) — those aren't F1 or Akamai
+ * traffic at all. Check the actual hostname instead.
+ */
+function isRelevantHost(url: string): boolean {
+  try {
+    const host = new URL(url).hostname;
+    return host.endsWith('formula1.com') || host.includes('akamai');
+  } catch {
+    return false;
+  }
+}
 const NAV_TIMEOUT_MS = 30_000;
 const RESPONSE_TIMEOUT_MS = 30_000;
 const FILL_RETRY_ATTEMPTS = 3;
@@ -165,7 +180,7 @@ export async function getSubscriptionToken(
     page.setDefaultTimeout(NAV_TIMEOUT_MS);
 
     page.on('response', (res) => {
-      if (NETWORK_LOG_HOST_FILTER.test(res.url())) {
+      if (isRelevantHost(res.url())) {
         networkLog.push({ method: res.request().method(), url: res.url(), status: res.status() });
         if (networkLog.length > NETWORK_LOG_MAX_ENTRIES) networkLog.shift();
       }
