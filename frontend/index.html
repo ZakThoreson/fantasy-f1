@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      GitHub Pages can't set real CSP response headers, so this meta tag is a
+      best-effort defense-in-depth layer — not a substitute for the
+      textContent-only DOM rendering used throughout src/render/.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none';"
+    />
+    <title>Fantasy F1 League Standings</title>
+    <link rel="stylesheet" href="/src/styles/main.css" />
+  </head>
+  <body>
+    <div id="app">
+      <p>Loading standings…</p>
+    </div>
+    <footer>
+      <p>
+        Unofficial fan project. Not affiliated with, endorsed by, or supported by Formula 1, the
+        FIA, or F1 Fantasy.
+      </p>
+    </footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

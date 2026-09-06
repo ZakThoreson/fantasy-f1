@@ -1,0 +1,27 @@
+{
+  "fetchedAt": "2026-01-01T00:00:00.000Z",
+  "leagueId": "4358307",
+  "entrants": [
+    {
+      "userId": "1",
+      "teamName": "Fastest Fingers <script>alert(1)</script>",
+      "firstName": "Ayrton",
+      "lastName": "S.",
+      "username": "asenna"
+    },
+    {
+      "userId": "2",
+      "teamName": "Tea & \"Strategy\"",
+      "firstName": "Lewis",
+      "lastName": "H.",
+      "username": null
+    },
+    {
+      "userId": "3",
+      "teamName": "Backmarkers United",
+      "firstName": "Kimi",
+      "lastName": "R.",
+      "username": "iceman"
+    }
+  ]
+}

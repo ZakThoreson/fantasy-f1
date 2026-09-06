@@ -1,0 +1,14 @@
+{
+  "name": "@fantasy-f1/shared",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "src/types.ts",
+  "types": "src/types.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

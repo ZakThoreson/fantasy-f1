@@ -1,0 +1,52 @@
+name: Update League Data
+
+on:
+  # F1's Actions cron can't know real race dates, so this fires a handful of
+  # times across Fri/Sat/Sun UTC to cover most race sessions worldwide. Extra
+  # runs on non-race weekends are cheap: the commit step is a no-op when the
+  # fetched data hasn't changed. Fall back to manual runs (workflow_dispatch)
+  # for anything this misses.
+  schedule:
+    - cron: '0 6,12,18,22 * * 5,6,0'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Fetch league data
+        env:
+          F1_USERNAME: ${{ secrets.F1_USERNAME }}
+          F1_PASSWORD: ${{ secrets.F1_PASSWORD }}
+          LEAGUE_ID: '4358307'
+        run: npm run fetch -w fetch
+
+      - name: Commit and push if data changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "No data changes, skipping commit."
+          else
+            git commit -m "chore(data): update league standings"
+            git push
+          fi

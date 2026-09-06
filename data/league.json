@@ -1,0 +1,49 @@
+{
+  "fetchedAt": "2026-01-01T00:00:00.000Z",
+  "leagueId": "4358307",
+  "leagueName": "Sample League (seed data — replaced by update-data.yml)",
+  "entrantsCount": 3,
+  "maxPoints": 120,
+  "minPoints": 40,
+  "entrants": [
+    {
+      "userId": "1",
+      "rank": 1,
+      "score": 120,
+      "teamName": "Fastest Fingers <script>alert(1)</script>",
+      "firstName": "Ayrton",
+      "lastName": "S.",
+      "username": "asenna",
+      "userCountry": "BR",
+      "isVerifiedEntrant": true,
+      "slot": 1,
+      "overallUsedBoosterIds": []
+    },
+    {
+      "userId": "2",
+      "rank": 2,
+      "score": 88,
+      "teamName": "Tea & \"Strategy\"",
+      "firstName": "Lewis",
+      "lastName": "H.",
+      "username": null,
+      "userCountry": "GB",
+      "isVerifiedEntrant": true,
+      "slot": 1,
+      "overallUsedBoosterIds": []
+    },
+    {
+      "userId": "3",
+      "rank": 3,
+      "score": 40,
+      "teamName": "Backmarkers United",
+      "firstName": "Kimi",
+      "lastName": "R.",
+      "username": "iceman",
+      "userCountry": "FI",
+      "isVerifiedEntrant": false,
+      "slot": 1,
+      "overallUsedBoosterIds": []
+    }
+  ]
+}
