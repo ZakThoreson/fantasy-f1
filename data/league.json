@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-22T10:30:24.642Z",
+  "fetchedAt": "2026-09-22T15:53:50.013Z",
   "leagueId": "4358307",
   "leagueName": "The Paddock Club '26",
   "entrantsCount": 14,
@@ -49,7 +49,7 @@
       "teamName": "Ferrari Team Strategy",
       "firstName": "Mitchell",
       "trend": 0,
-      "teamValue": 114.1
+      "teamValue": 113.5
     },
     {
       "userId": "188775059",
@@ -103,7 +103,7 @@
       "teamName": "McLauren Racing Team II",
       "firstName": "Lauren",
       "trend": -1,
-      "teamValue": 106.4
+      "teamValue": 105.8
     },
     {
       "userId": "64892595",
@@ -112,7 +112,7 @@
       "teamName": "CaddyShuck",
       "firstName": "William",
       "trend": 1,
-      "teamValue": 98.8
+      "teamValue": 98.2
     },
     {
       "userId": "202806462",
@@ -121,7 +121,7 @@
       "teamName": "[Ferrari Tea Break]",
       "firstName": "Justine",
       "trend": -1,
-      "teamValue": 108.7
+      "teamValue": 108.1
     },
     {
       "userId": "181271801",
@@ -130,7 +130,7 @@
       "teamName": "Fireworks in Bahrain",
       "firstName": "Elliott",
       "trend": 0,
-      "teamValue": 100
+      "teamValue": 99.4
     }
   ]
 }
