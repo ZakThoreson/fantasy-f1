@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-10T11:31:30.513Z",
+  "fetchedAt": "2026-10-10T16:31:57.287Z",
   "leagueId": "4358307",
   "rounds": [
     {
@@ -975,6 +975,67 @@
         {
           "userId": "217725028",
           "points": 130
+        }
+      ]
+    },
+    {
+      "round": 17,
+      "entrants": [
+        {
+          "userId": "64892595",
+          "points": 78
+        },
+        {
+          "userId": "202806462",
+          "points": 70
+        },
+        {
+          "userId": "154970788",
+          "points": 66
+        },
+        {
+          "userId": "179358368",
+          "points": 62
+        },
+        {
+          "userId": "203033531",
+          "points": 54
+        },
+        {
+          "userId": "217723884",
+          "points": 48
+        },
+        {
+          "userId": "181271801",
+          "points": 40
+        },
+        {
+          "userId": "182551911",
+          "points": 30
+        },
+        {
+          "userId": "201738224",
+          "points": 27
+        },
+        {
+          "userId": "188775059",
+          "points": 27
+        },
+        {
+          "userId": "202303355",
+          "points": 27
+        },
+        {
+          "userId": "202798179",
+          "points": 21
+        },
+        {
+          "userId": "78775061",
+          "points": 9
+        },
+        {
+          "userId": "217725028",
+          "points": -12
         }
       ]
     }
