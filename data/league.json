@@ -1,136 +1,136 @@
 {
-  "fetchedAt": "2026-10-25T20:06:46.102Z",
+  "fetchedAt": "2026-10-26T02:09:41.673Z",
   "leagueId": "4358307",
   "leagueName": "The Paddock Club '26",
   "entrantsCount": 14,
-  "maxPoints": 4273,
-  "minPoints": 2172,
+  "maxPoints": 4477,
+  "minPoints": 2253,
   "entrants": [
     {
       "userId": "78775061",
       "rank": 1,
-      "score": 4273,
+      "score": 4477,
       "teamName": "Forza Cavallino Rampante",
       "firstName": "Zachary",
       "trend": 0,
-      "teamValue": 193.9
+      "teamValue": 195.1
     },
     {
       "userId": "201738224",
       "rank": 2,
-      "score": 4225,
+      "score": 4331,
       "teamName": "Sim Class Hero",
       "firstName": "Taylan",
       "trend": 0,
-      "teamValue": 131.6
+      "teamValue": 133.8
     },
     {
       "userId": "202303355",
       "rank": 3,
-      "score": 3812,
+      "score": 3922,
       "teamName": "Booger McFartPants",
       "firstName": "Robert",
       "trend": 0,
-      "teamValue": 115.9
+      "teamValue": 117.1
     },
     {
       "userId": "203033531",
       "rank": 4,
-      "score": 3784,
+      "score": 3880,
       "teamName": "SheIsAStellarRide",
       "firstName": "Stephen",
       "trend": 0,
-      "teamValue": 120.6
-    },
-    {
-      "userId": "217723884",
-      "rank": 5,
-      "score": 3651,
-      "teamName": "sip&send it",
-      "firstName": "Catherine",
-      "trend": 0,
-      "teamValue": 119.2
+      "teamValue": 123.1
     },
     {
       "userId": "182551911",
-      "rank": 6,
-      "score": 3645,
+      "rank": 5,
+      "score": 3777,
       "teamName": "Ferrari Team Strategy",
       "firstName": "Mitchell",
-      "trend": 0,
-      "teamValue": 116.3
+      "trend": 1,
+      "teamValue": 116.1
     },
     {
       "userId": "188775059",
-      "rank": 7,
-      "score": 3616,
+      "rank": 6,
+      "score": 3745,
       "teamName": "Schraff's super team 1",
       "firstName": "Stephen",
-      "trend": 0,
-      "teamValue": 116.5
+      "trend": 1,
+      "teamValue": 117.1
+    },
+    {
+      "userId": "217723884",
+      "rank": 7,
+      "score": 3743,
+      "teamName": "sip&send it",
+      "firstName": "Catherine",
+      "trend": -1,
+      "teamValue": 121.7
     },
     {
       "userId": "154970788",
       "rank": 8,
-      "score": 3540,
+      "score": 3660,
       "teamName": "Formula 1Fish",
       "firstName": "Austin",
       "trend": 0,
-      "teamValue": 119.8
+      "teamValue": 121.9
     },
     {
       "userId": "202798179",
       "rank": 9,
-      "score": 3199,
+      "score": 3216,
       "teamName": "Formula 61 Racing",
       "firstName": "Eric",
       "trend": 0,
-      "teamValue": 112.1
+      "teamValue": 114.7
     },
     {
       "userId": "179358368",
       "rank": 10,
-      "score": 2967,
+      "score": 3078,
       "teamName": "McLauren Racing Team II",
       "firstName": "Lauren",
       "trend": 0,
-      "teamValue": 110.9
+      "teamValue": 113.6
     },
     {
       "userId": "217725028",
       "rank": 11,
-      "score": 2918,
+      "score": 2943,
       "teamName": "Zoom Zoom Zoom Season 2",
       "firstName": "Michelle",
       "trend": 0,
-      "teamValue": 111.5
+      "teamValue": 112.6
     },
     {
       "userId": "202806462",
       "rank": 12,
-      "score": 2695,
+      "score": 2776,
       "teamName": "[Ferrari Tea Break]",
       "firstName": "Justine",
       "trend": 0,
-      "teamValue": 112.1
+      "teamValue": 114.1
     },
     {
       "userId": "64892595",
       "rank": 13,
-      "score": 2632,
+      "score": 2717,
       "teamName": "CaddyShuck",
       "firstName": "William",
       "trend": 0,
-      "teamValue": 99.2
+      "teamValue": 100
     },
     {
       "userId": "181271801",
       "rank": 14,
-      "score": 2172,
+      "score": 2253,
       "teamName": "Fireworks in Bahrain",
       "firstName": "Elliott",
       "trend": 0,
-      "teamValue": 106.2
+      "teamValue": 108.6
     }
   ]
 }

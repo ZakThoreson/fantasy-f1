@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-25T20:06:46.404Z",
+  "fetchedAt": "2026-10-26T02:09:44.429Z",
   "leagueId": "4358307",
   "rounds": [
     {
@@ -1044,59 +1044,59 @@
       "entrants": [
         {
           "userId": "78775061",
-          "points": 92
-        },
-        {
-          "userId": "188775059",
-          "points": 70
+          "points": 296
         },
         {
           "userId": "182551911",
-          "points": 70
+          "points": 202
         },
         {
-          "userId": "202303355",
-          "points": 70
-        },
-        {
-          "userId": "201738224",
-          "points": 65
+          "userId": "188775059",
+          "points": 199
         },
         {
           "userId": "154970788",
-          "points": 64
+          "points": 184
         },
         {
-          "userId": "217723884",
-          "points": 64
+          "userId": "202303355",
+          "points": 180
         },
         {
-          "userId": "203033531",
-          "points": 63
-        },
-        {
-          "userId": "202798179",
-          "points": 57
-        },
-        {
-          "userId": "202806462",
-          "points": 57
+          "userId": "201738224",
+          "points": 171
         },
         {
           "userId": "179358368",
-          "points": 49
+          "points": 160
         },
         {
-          "userId": "217725028",
-          "points": 46
+          "userId": "203033531",
+          "points": 159
+        },
+        {
+          "userId": "217723884",
+          "points": 156
+        },
+        {
+          "userId": "202806462",
+          "points": 138
         },
         {
           "userId": "64892595",
-          "points": 39
+          "points": 124
         },
         {
           "userId": "181271801",
-          "points": 37
+          "points": 118
+        },
+        {
+          "userId": "202798179",
+          "points": 74
+        },
+        {
+          "userId": "217725028",
+          "points": 71
         }
       ]
     }
