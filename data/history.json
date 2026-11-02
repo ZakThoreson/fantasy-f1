@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-02T03:11:16.298Z",
+  "fetchedAt": "2026-11-02T14:05:15.391Z",
   "leagueId": "4358307",
   "rounds": [
     {
@@ -1105,59 +1105,59 @@
       "entrants": [
         {
           "userId": "217723884",
-          "points": 177
+          "points": 232
         },
         {
           "userId": "202806462",
-          "points": 139
-        },
-        {
-          "userId": "188775059",
-          "points": 138
-        },
-        {
-          "userId": "78775061",
-          "points": 137
+          "points": 219
         },
         {
           "userId": "203033531",
-          "points": 130
-        },
-        {
-          "userId": "201738224",
-          "points": 129
-        },
-        {
-          "userId": "182551911",
-          "points": 123
-        },
-        {
-          "userId": "154970788",
-          "points": 120
-        },
-        {
-          "userId": "202303355",
-          "points": 115
-        },
-        {
-          "userId": "179358368",
-          "points": 97
+          "points": 208
         },
         {
           "userId": "202798179",
-          "points": 95
+          "points": 196
+        },
+        {
+          "userId": "78775061",
+          "points": 196
+        },
+        {
+          "userId": "188775059",
+          "points": 189
+        },
+        {
+          "userId": "154970788",
+          "points": 181
+        },
+        {
+          "userId": "182551911",
+          "points": 172
+        },
+        {
+          "userId": "201738224",
+          "points": 161
+        },
+        {
+          "userId": "202303355",
+          "points": 156
+        },
+        {
+          "userId": "179358368",
+          "points": 154
         },
         {
           "userId": "64892595",
-          "points": 82
+          "points": 135
         },
         {
           "userId": "181271801",
-          "points": 37
+          "points": 122
         },
         {
           "userId": "217725028",
-          "points": 22
+          "points": 82
         }
       ]
     }
