@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-08T12:23:34.931Z",
+  "fetchedAt": "2026-11-08T21:27:22.892Z",
   "leagueId": "4358307",
   "rounds": [
     {
@@ -1165,60 +1165,60 @@
       "round": 20,
       "entrants": [
         {
-          "userId": "217725028",
-          "points": 62
-        },
-        {
-          "userId": "202798179",
-          "points": 61
-        },
-        {
-          "userId": "202303355",
-          "points": 60
-        },
-        {
-          "userId": "188775059",
-          "points": 60
-        },
-        {
-          "userId": "78775061",
-          "points": 59
-        },
-        {
-          "userId": "182551911",
-          "points": 58
+          "userId": "203033531",
+          "points": 222
         },
         {
           "userId": "201738224",
-          "points": 56
+          "points": 213
         },
         {
-          "userId": "179358368",
-          "points": 53
+          "userId": "188775059",
+          "points": 171
         },
         {
-          "userId": "181271801",
-          "points": 53
+          "userId": "78775061",
+          "points": 166
         },
         {
-          "userId": "217723884",
-          "points": 47
+          "userId": "182551911",
+          "points": 163
+        },
+        {
+          "userId": "202303355",
+          "points": 147
         },
         {
           "userId": "154970788",
-          "points": 44
+          "points": 143
         },
         {
-          "userId": "64892595",
-          "points": 43
+          "userId": "202798179",
+          "points": 141
+        },
+        {
+          "userId": "217723884",
+          "points": 132
+        },
+        {
+          "userId": "217725028",
+          "points": 123
         },
         {
           "userId": "202806462",
-          "points": 38
+          "points": 123
         },
         {
-          "userId": "203033531",
-          "points": 30
+          "userId": "181271801",
+          "points": 96
+        },
+        {
+          "userId": "179358368",
+          "points": 83
+        },
+        {
+          "userId": "64892595",
+          "points": 64
         }
       ]
     }
